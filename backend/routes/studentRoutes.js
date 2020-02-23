@@ -33,7 +33,7 @@ route.post(
       });
       console.log(req.body.student.name);
 
-      res.status(201).json({
+      res.status(201).send({
         user: {
           email: registerStudent.email,
           name: registerStudent.name,
@@ -42,7 +42,7 @@ route.post(
         }
       });
     } catch (err) {
-      res.status(500).json({
+      res.status(500).send({
         errors: {
           body: err
         }
@@ -56,6 +56,8 @@ route.post(
   validateEmail,validatePassword,
   async(req,res)=>{
 
+    console.log(req.body.student.email);
+    console.log("In login")
     
     const studenttoken = await generateToken(req.body.student.email);
     try{
@@ -73,14 +75,14 @@ route.post(
             console.log(student.password)
             if(err)
             {
-                res.status(500).json({
+                res.status(500).send({
                     errors: {
                       body: err
                     }
                   });
             }
             else if(!isMatch){
-                res.status(403).json({
+                res.status(403).send({
                     errors: {
                       body: "Unauthenticated User"
                     }
@@ -88,7 +90,7 @@ route.post(
             }
             else{
                 console.log("succesfully logged in");
-               res.status(201).json({
+               res.status(201).send({
                 user: {
                   emailId: student.email,
                   name: student.name,
@@ -101,7 +103,7 @@ route.post(
     })
     }
     else{
-        res.status(401).json({
+        res.status(401).send({
             errors: {
               body: "Unauthorised User"
             }
@@ -111,7 +113,7 @@ route.post(
 
     catch(err)
     {
-        res.status(500).json({
+        res.status(500).send({
             errors: {
               body: err
             }
