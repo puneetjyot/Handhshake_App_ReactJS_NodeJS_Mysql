@@ -170,7 +170,8 @@ student_profile.belongsTo(student_basic_details,{foreignKey:'student_basic_detai
 student_education.belongsTo(student_basic_details,{foreignKey:'student_basic_detail_id'})
 student_experience.belongsTo(student_basic_details,{foreignKey:'student_basic_detail_id'})
 student_skills.belongsToMany(student_basic_details,{through :'student_skills_relation'})
+student_basic_details.belongsToMany(student_skills,{through :'student_skills_relation'})
 
 module.exports = {
-    student_basic_details,sequelizeconnection,student_profile,student_education,student_skills
+    student_basic_details,sequelizeconnection,student_profile,student_education,student_skills,student_experience
 }

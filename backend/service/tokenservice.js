@@ -5,7 +5,7 @@ function generateToken(username) {
     return jwt.sign({ payload: username }, key.secret)
 }
 function decryptToken(token) {
-   
+   console.log(token)
     let email;
    
     try {
