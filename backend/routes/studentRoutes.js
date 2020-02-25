@@ -9,9 +9,79 @@ const {
   validatePassword,
   validateEmail
 } = require("../studentmiddleware");
-const { student_basic_details } = require("../db/index");
+const { student_basic_details,student_profile,student_education,student_skills } = require("../db/index");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
+
+route.post(
+  "/student",async (req, res) => {
+    Decryptedtoken= decryptToken(req.headers.token);
+    let studentId,email
+    const studentEducation
+  console.log(Decryptedtoken.email)
+  if(Decryptedtoken.email!==null){
+
+    await student_basic_details.findOne({
+      where:{
+        email:Decryptedtoken.email
+      }
+    })
+    .then((tokenuser)=>{
+      console.log(tokenuser)
+     studentId=tokenuser.dataValues.student_basic_detail_id
+     email=tokenuser.dataValues.emailId
+    })
+  }
+
+  else{
+    return   res.json({
+      errors:{
+        message:[Decryptedtoken.error]
+      }
+    })
+    }
+
+   let allEducation =await student_education.findAll({
+      student_basic_detail_id:studentId
+    })
+    .then(student_educations=>{
+      // studentEducation=;
+      console.log(student_educations.dataValues)
+    })
+    
+    await student_profile.findOne({
+      student_basic_detail_id:studentId
+    })
+    .then(studentprofile=>{
+      const studenttoken = await generateToken(email)
+      studentprofile=studentprofile.dataValues;
+
+
+
+      res.status(201).json({
+        user: {
+          email: email,
+          career_objective:studentprofile.career_objective,
+          profile_picture:studentprofile.profile_picture,
+          token:studenttoken,
+          // education:
+          // {
+          //   schoolname:studentEducation.school_name,
+          //   educationlevel:studentEducation.education_level,
+          //   starttime:studentEducation.start_time,
+          //   endtime:studentEducation.end_time,
+          //   major:studentEducation.major,
+          //   minor:studentEducation.minor,
+          //   gpa:studentEducation.GPA,
+          //   gpaBoolean:studentEducation.GPAboolean,
+
+
+          // }
+         
+        }
+      })
+    })
+  })
 
 route.post(
   "/register",
@@ -122,5 +192,6 @@ route.post(
 }
   
 );
+
 
 module.exports = route;
