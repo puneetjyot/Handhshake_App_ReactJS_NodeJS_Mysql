@@ -7,7 +7,8 @@ const secret=require('./service/key')
 const app = express();
 app.use(flash())
 app.use(function(req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -15,7 +16,7 @@ app.use(function(req, res, next) {
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
+    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization"
   );
   res.setHeader("Cache-Control", "no-cache");
   next();
@@ -32,6 +33,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use("/student", require("./routes/studentRoutes"));
+app.use("/student/experience", require("./routes/studentexperience"));
 app.use("/company", require("./routes/companyRoutes"));
 module.exports = app;
 // app.listen(3001);

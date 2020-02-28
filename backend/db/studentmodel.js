@@ -147,6 +147,9 @@ const student_education=
             },
             still_working_boolean:{
                 type:DT.BOOLEAN
+            },
+            description:{
+                type:DT.STRING(500)
             }
 
         }

@@ -25,9 +25,9 @@ const bcrypt = require("bcrypt");
 
 route.get("/", async (req, res) => {
   
-  console.log(req.headers);
+  console.log("In student route"+JSON.stringify(req.headers));
   Decryptedtoken = decryptToken(req.headers.authorization);
-  let studentId, email;
+  let studentId, email, name;
 
   console.log(Decryptedtoken.email);
   if (Decryptedtoken.email !== null) {
@@ -43,6 +43,8 @@ route.get("/", async (req, res) => {
         );
         studentId = tokenuser.dataValues.student_basic_detail_id;
         email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
       })
       .catch(err =>{
         console.log(`error getting student basic details ${err}`)
@@ -109,6 +111,7 @@ student_profile
     res.status(201).json({
       student: {
         email: email,
+        name:name,
         career_objective: studentprofile.career_objective,
         profile_picture: studentprofile.profile_picture,
         token: studenttoken,
@@ -133,6 +136,8 @@ student_profile
     console.log(`error getting student profile ${err}`)
   });;
 })
+
+
 
 route.post(
   "/register",
@@ -171,7 +176,49 @@ route.post(
     }
   }
 );
+route.post("/journey",async(req,res)=>{
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
 
+      })
+      .catch(err =>{
+        console.log(`error posting student journey ${err}`)
+      });
+    
+      const result = await student_profile.update(
+        { career_objective: req.body.student.career_objective },
+        { where: { student_basic_detail_id: studentId } }
+      )
+      res.status(201).send(
+        {
+          result:req.body.student.career_objective 
+        }
+      )
+}
+catch(err)
+{
+  console.log(`error posting student journey ${err}`)
+  res.status(500).send({
+    errors: {
+      body: err
+    }
+
+})
+}
+})
 route.post("/login", validateEmail, validatePassword, async (req, res) => {
   console.log(req.body.student.email);
   console.log("In login");
@@ -230,5 +277,424 @@ route.post("/login", validateEmail, validatePassword, async (req, res) => {
     });
   }
 });
+
+route.get('/journey',async(req,res)=>{
+  console.log("----------getting journey")
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details ------------------------"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error posting student journey ${err}`)
+      });
+    
+      const result = await student_profile.findOne(
+       
+        { where: { student_basic_detail_id: studentId } }
+      )
+      console.log("sending journey-----------------"+result.career_objective)
+      res.status(201).send(
+        {
+          result:result.career_objective 
+        }
+      )
+}
+catch(err)
+{
+  console.log(`error posting student journey ${err}`)
+  res.status(500).send({
+    errors: {
+      body: err
+    }
+
+})
+}
+})
+
+
+route.put("/name", async (req, res) => {
+  console.log(req.body);
+  console.log("In updating name");
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+    const result = await student_basic_details.update(
+      { name: req.body.student.name },
+      { where: { student_basic_detail_id: studentId } }
+    )
+    res.status(201).send({
+      student: {
+       
+        name: req.body.student.name
+       
+      }
+    });
+    
+  } catch (err) {
+    res.status(403).send({
+      error: {
+       
+        error:err
+       
+      }
+    });
+  }
+  
+});
+
+
+route.post('/education', async(req,res)=>{
+  console.log(req.body);
+  console.log("In updating name");
+  var studentId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+   
+      const result=await student_education.create({
+        student_basic_detail_id:studentId,
+        school_name: req.body.education.schoolname,
+        education_level: req.body.education.educationlevel,
+        major: req.body.education.major,
+        minor: req.body.education.minor?req.body.education.minor:'',
+        start_time: req.body.education.startDate,
+        end_time: req.body.education.endDate,
+        GPA: req.body.education.gpa
+        
+      })
+
+      if(result)
+      {
+        res.status(201).send(result)
+      }
+      else{
+        res.status(403).send(
+          {
+            errors:{
+              err:"Unable to add school"
+        }
+      }
+      )
+      }
+
+   
+   
+   
+    }
+catch(err)
+{
+  console.log(err);
+  res.status(403).send(
+    {
+    
+      errors:{
+        err:err
+  }
+}
+)
+}
+})
+
+
+
+route.put('/education', async(req,res)=>{
+  console.log(req.body);
+  console.log("In updating name");
+  var studentId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+   
+      const preeducation= await student_education.findOne({
+        where:{
+          education_id:req.body.education.educationId
+        }
+      }) 
+      const result=await student_education.update(
+        {
+       
+          
+          school_name: req.body.education.schoolname?req.body.education.schoolname:preeducation.school_name,
+          education_level: req.body.education.education_level?req.body.education.education_level:preeducation.education_level,
+          major: req.body.education.major?req.body.education.major:preeducation.major,
+          minor: req.body.education.minor?req.body.education.minor:'',
+          start_time: req.body.education.startDate?req.body.education.startDate:preeducation.start_time,
+          end_time: req.body.education.endDate?req.body.education.endDate:preeducation.end_time,
+          GPA: req.body.education.gpa?req.body.education.gpa:preeducation.GPA
+
+        },
+        { where: { student_basic_detail_id: studentId,
+                    education_id:req.body.education.educationId
+        } 
+      })
+
+      if(result)
+      {
+        const updateEducation= await student_education.findAll({
+          where:{
+            student_basic_detail_id: studentId
+          }
+        })
+        if(updateEducation){
+        res.status(201).send(updateEducation)
+        }
+        else{
+          res.status(403).send(
+            {
+              errors:{
+                err:"Unable to update school"
+          }
+        }
+        )
+        }
+      }
+      else{
+        res.status(403).send(
+          {
+            errors:{
+              err:"Unable to update school"
+        }
+      }
+      )
+      }
+
+   
+   
+   
+    }
+catch(err)
+{
+  console.log(err);
+  res.status(403).send(
+    {
+    
+      errors:{
+        err:err
+  }
+}
+)
+}
+})
+
+route.delete('/education', async(req,res)=>{
+  console.log(req.body);
+  console.log("In deleting name");
+  var studentId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+   
+      const preeducation= await student_education.findOne({
+        where:{
+          education_id:req.body.data.education.educationId
+        }
+      }) 
+      const result=await preeducation.destroy()
+
+      if(result)
+      {
+        const updatedEducation=await student_education.findAll({
+          where:{
+            student_basic_detail_id:studentId
+          }
+        })
+        if(updatedEducation){
+          res.status(201).send(updatedEducation)
+        }
+        else{
+          res.status(403).send(
+            {
+              errors:{
+                err:"Unable to delete school"
+          }
+        }
+        )
+        }
+       
+      }
+      else{
+        res.status(403).send(
+          {
+            errors:{
+              err:"Unable to delete school"
+        }
+      }
+      )
+      }
+
+   
+   
+   
+    }
+catch(err)
+{
+  console.log(err+"error sdsad");
+  res.status(500).send(
+  {
+
+    errors:{
+      body:'cannot delete as record is not present'
+    }
+
+  }
+    
+      
+      
+  
+
+)
+}
+})
+route.get('/education', async(req,res)=>{
+  console.log(req.body);
+  console.log("In get education");
+  var studentId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+   
+      const preeducation= await student_education.findAll({
+        where:{
+         student_basic_detail_id:studentId
+        }
+      }) 
+     
+
+      if(preeducation)
+      {
+        res.status(201).send(preeducation)
+      }
+      else{
+        res.status(403).send(
+          {
+            errors:{
+              err:"Unable to delete school"
+        }
+      }
+      )
+      }
+
+   
+   
+   
+    }
+catch(err)
+{
+  console.log(err+"error sdsad");
+  res.status(500).send(
+  {
+
+    errors:{
+      body:'cannot delete as record is not present'
+    }
+
+  }
+    
+      
+      
+  
+
+)
+}
+})
+
 
 module.exports = route;
