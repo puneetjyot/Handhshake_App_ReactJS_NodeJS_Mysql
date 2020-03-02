@@ -697,6 +697,68 @@ catch(err)
 })
 
 
+route.post('/picture', async(req,res)=>{
+  console.log(req.body);
+  console.log("In updating name");
+  var studentId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+   
+      const result=await student_profile.update(
+        { profile_picture: req.body.student.profile_picture },
+        { where: { student_basic_detail_id: studentId } }
+      )
+
+      if(result)
+      {
+        
+        res.status(201).send(result)
+      }
+      else{
+        res.status(403).send(
+          {
+            errors:{
+              err:"Unable to add school"
+        }
+      }
+      )
+      }
+
+   
+   
+   
+    }
+catch(err)
+{
+  console.log(err);
+  res.status(403).send(
+    {
+    
+      errors:{
+        err:err
+  }
+}
+)
+}
+})
 
 
 
