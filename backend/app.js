@@ -35,5 +35,6 @@ app.use(passport.session())
 app.use("/student", require("./routes/studentRoutes"));
 app.use("/student/experience", require("./routes/studentexperience"));
 app.use("/company", require("./routes/companyRoutes"));
+app.use("/jobs", require("./routes/jobsRoute"));
 module.exports = app;
 // app.listen(3001);

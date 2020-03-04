@@ -116,6 +116,8 @@ route.post('/register', validateUsername,validatePassword,validateEmail,async (r
   );
 
 
+  route.post
+
 module.exports = route;
 
 

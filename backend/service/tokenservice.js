@@ -5,11 +5,15 @@ function generateToken(username) {
     return jwt.sign({ payload: username }, key.secret)
 }
 function decryptToken(token) {
+   
+     console.log('inside decrypt token'+token)
+      let email;
+     try {
     token=token.replace(/^"|"$/g, '');
    console.log('inside decrypt token'+token)
-    let email;
    
-    try {
+   
+  
         email = jwt.verify(token, key.secret).payload;
        
     }

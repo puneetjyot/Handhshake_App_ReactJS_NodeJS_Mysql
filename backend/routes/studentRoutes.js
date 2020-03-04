@@ -730,7 +730,7 @@ route.post('/picture', async(req,res)=>{
       if(result)
       {
         
-        res.status(201).send(result)
+      //  res.status(201).send({picture:{req.body.student.profile_picture}})
       }
       else{
         res.status(403).send(
@@ -759,6 +759,227 @@ catch(err)
 )
 }
 })
+
+route.post('/skills', async(req,res)=>{
+  console.log(req.body);
+  console.log("In posting skills");
+  var studentId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+   
+    console.log(req.body.student.skill_name)
+      const result=await student_skills.create(
+        {
+       student_basic_detail_id:studentId,
+       skill_name:req.body.student.skill_name
+        }
+
+      )
+     // console.log(result)
+      if (result) {
+      res.status(201).send({
+        result
+      });
+    }
+    else{
+      res.status(403).send({
+        error:{
+          error:'Cant add skill'
+        }
+        
+      });
+    }
+
+     
+   
+    }
+catch(err)
+{
+  console.log(err);
+  res.status(403).send(
+    {
+    
+      errors:{
+        err:err
+  }
+}
+)
+}
+})
+
+
+///// Get for skills
+
+route.get('/skills', async(req,res)=>{
+  console.log(req.body);
+  console.log("In get education");
+  var studentId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+   
+      const preeducation= await student_skills.findAll({
+        where:{
+         student_basic_detail_id:studentId
+        }
+      }) 
+     
+
+      if(preeducation)
+      {
+        res.status(201).send(preeducation)
+      }
+      else{
+        res.status(403).send(
+          {
+            errors:{
+              err:"Unable to get skills"
+        }
+      }
+      )
+      }
+
+   
+   
+   
+    }
+catch(err)
+{
+  console.log(err+"error sdsad");
+  res.status(500).send(
+  {
+
+    errors:{
+      body:'cannot find key as record is not present'
+    }
+
+  }
+  )
+}
+})
+
+  route.delete('/skills', async(req,res)=>{
+    console.log();
+    console.log("In deleting name");
+    var studentId;
+    Decryptedtoken = decryptToken(req.headers.authorization);
+    try {
+      await student_basic_details
+        .findOne({
+          where: {
+            emailId: Decryptedtoken.email
+          }
+        })
+        .then(tokenuser => {
+          console.log(
+            tokenuser.dataValues.student_basic_detail_id + "in details"
+          );
+          studentId = tokenuser.dataValues.student_basic_detail_id;
+          email = tokenuser.dataValues.emailId;
+          name= tokenuser.dataValues.name;
+  
+        })
+        .catch(err =>{
+          console.log(`error getting student basic details ${err}`)
+        });
+     
+        const skills= await student_skills.findOne({
+          where:{
+            skill_id:req.body.data.skills.skill_id
+          }
+        }) 
+        const result=await skills.destroy()
+  
+        if(result)
+        {
+          const updatedskills=await student_skills.findAll({
+            where:{
+              student_basic_detail_id:studentId
+            }
+          })
+          if(updatedskills){
+            res.status(201).send(updatedskills)
+          }
+          else{
+            res.status(403).send(
+              {
+                errors:{
+                  err:"Unable to delete skill"
+            }
+          }
+          )
+          }
+         
+        }
+        else{
+          res.status(403).send(
+            {
+              errors:{
+                err:"Unable to delete skill"
+          }
+        }
+        )
+        }
+  
+     
+     
+     
+      }
+  catch(err)
+  {
+    console.log(err+"error sdsad");
+    res.status(500).send(
+    {
+  
+      errors:{
+        body:'cannot delete as record is not present'
+      }
+  
+    }
+ 
+  )
+  }
+  })
+    
+      
+      
+  
+
 
 
 
