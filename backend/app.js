@@ -5,7 +5,9 @@ const session = require('express-session')
 const flash=require('connect-flash')
 const secret=require('./service/key')
 const app = express();
+
 app.use(flash())
+
 app.use(function(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   
@@ -36,5 +38,6 @@ app.use("/student", require("./routes/studentRoutes"));
 app.use("/student/experience", require("./routes/studentexperience"));
 app.use("/company", require("./routes/companyRoutes"));
 app.use("/jobs", require("./routes/jobsRoute"));
+app.use("/events", require("./routes/eventRoute"));
 module.exports = app;
 // app.listen(3001);

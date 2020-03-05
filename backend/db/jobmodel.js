@@ -66,19 +66,15 @@ const sequelizeconnection = new sequelize('handshake', 'admin', 'admin#123', {
           allowNull: false
         }
 
-    },
-    { timestamps: false }
-
+    }
+    
     )
   sequelizeconnection.sync()
   console.log("========================================")
 
     job.belongsTo(company_basic_details,{foreignKey:'company_basic_detail_id'})
-    student_basic_details.belongsToMany(job,{through:studentjobs,foreignkey:'student_basic_details_id'})   
-    job.belongsToMany(student_basic_details,{through:studentjobs,foreignKey:'job_id'}) 
-    student_basic_details.hasMany(studentjobs)
-    studentjobs.belongsTo(student_basic_details)
-    job.hasMany(studentjobs)
-    studentjobs.belongsTo(job)
 
+    student_basic_details.belongsToMany(job,{through:studentjobs,foreignKey:'student_basic_detail_id'})   
+    job.belongsToMany(student_basic_details,{through:studentjobs,foreignKey:'job_id'}) 
+    
   module.exports={job,studentjobs}

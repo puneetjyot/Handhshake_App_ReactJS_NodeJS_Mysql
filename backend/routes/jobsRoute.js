@@ -4,6 +4,7 @@ const { generateToken, decryptToken } = require("../service/tokenservice");
 const { generateUUID } = require("../service/uuidservice");
 const passport = require("../authenticate/passport_init");
 const key = require("../service/key");
+const fileUpload = require('express-fileupload');
 const {
   student_basic_details
   // student_profile,
@@ -23,7 +24,19 @@ const{company_basic_details} =require('../db/comapnymodel')
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 var multer = require('multer')
+route.use(fileUpload());
 
+
+var storage = multer.diskStorage({
+      destination: function (req, file, cb) {
+      cb(null, 'public')
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' +file.originalname )
+    }
+})
+
+var upload = multer({ storage: storage }).single('file')
 
 route.get('/',async(req,res)=>{
      console.log("----------getting jobs")
@@ -271,6 +284,72 @@ catch(err)
     }
 
 })
+}
+})
+
+route.post('/upload',async  (req, res, next) => {
+  
+  console.log(req.body);
+    console.log("applying for job")
+     var studentId;
+     var student;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        student=tokenuser.dataValues
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+   
+
+  console.log(req.body.id+"this is the id");
+  var bookId=req.body.id
+  let file = req.files.file;
+
+  upload(req, res, function (err) {
+    
+    console.log('here in uploading file')
+    console.log(req.files)
+           if (err instanceof multer.MulterError) {
+               return res.status(500).json(err)
+           } else if (err) {
+               return res.status(500).json(err)
+           }
+           console.log(req.file);
+    //  return res.status(200).send(req.file)
+
+    })
+
+    console.log(student,'-----------------------------------',bookId)
+    const result=await studentjobs.create({
+           
+             job_id:bookId,
+             student_basic_detail_id:student.student_basic_detail_id
+        
+    })
+    if(result)
+    {
+        res.status(201).send(result)
+    }
+}
+catch(err)
+{
+  console.log(err)
+  res.status(403).send(err.name)
 }
 })
 

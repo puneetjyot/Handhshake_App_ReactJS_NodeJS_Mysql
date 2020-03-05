@@ -6,6 +6,7 @@ const sequelizeconnection = new sequelize('handshake', 'admin', 'admin#123', {
     dialect: 'mysql'/* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */
   });
   const {student_basic_details } = require ("./studentmodel");
+  const {company_basic_details} = require('./comapnymodel')
 
 
   const event=
@@ -35,12 +36,32 @@ const sequelizeconnection = new sequelize('handshake', 'admin', 'admin#123', {
     },
     eligibility:{
         type:DT.STRING(50)
+    },
+     event_description:{
+        type:DT.TEXT
     }
     })
 
+   const studentevents=
+
+    sequelizeconnection.define(
+    "studentevents",
+    {
+        
+        id:{
+          type: DT.INTEGER,
+          primaryKey: true,
+          autoIncrement: true,
+          allowNull: false
+        }
+
+    }
+    
+    )
   sequelizeconnection.sync()
 
-    student_basic_details.belongsToMany(event,{through:'studentevent'})   
-    event.belongsToMany(student_basic_details,{through:'studentevent'}) 
+   event.belongsTo(company_basic_details,{foreignKey:'company_basic_detail_id'})
+    student_basic_details.belongsToMany(event,{through:studentevents,foreignKey:'student_basic_detail_id'})   
+    event.belongsToMany(student_basic_details,{through:studentevents,foreignKey:'event_detail_id'}) 
 
-  module.exports={event}
+  module.exports={event,studentevents}
