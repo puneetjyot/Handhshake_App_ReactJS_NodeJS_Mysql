@@ -36,7 +36,7 @@ const sequelizeconnection = new sequelize('handshake', 'admin', 'admin#123', {
         type:DT.STRING(50)
     },
     job_description:{
-        type:DT.STRING(500)
+        type:DT.TEXT
     },
 
     job_category:{

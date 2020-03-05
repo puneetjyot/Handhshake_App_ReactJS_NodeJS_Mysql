@@ -22,6 +22,7 @@ const{
 const{company_basic_details} =require('../db/comapnymodel')
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+var multer = require('multer')
 
 
 route.get('/',async(req,res)=>{
@@ -47,7 +48,13 @@ route.get('/',async(req,res)=>{
         console.log(`error posting student journey ${err}`)
       });
     
-      const result = await job.findAll()
+      const result = await job.findAll({
+        include:[{
+              model:company_basic_details
+           
+          }]
+      }
+      )
       console.log("sending jobs-----------------"+result)
       res.status(201).send(
         {
