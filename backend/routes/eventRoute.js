@@ -75,7 +75,54 @@ catch(err)
 }
 })
 
+route.post('/register',async  (req, res, next) => {
+  
+  console.log(req.body);
+    console.log("registering for event")
+     var studentId;
+     var student;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        student=tokenuser.dataValues
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
 
+      })
+      .catch(err =>{
+        console.log(`error getting student basic details ${err}`)
+      });
+   
+
+ 
+    console.log(student,'-----------------------------------')
+    const result=await studentevents.create({
+           
+             event_detail_id:req.body.event.event_id,
+             student_basic_detail_id:student.student_basic_detail_id
+        
+    })
+    if(result)
+    {
+        res.status(201).send(result)
+    }
+}
+catch(err)
+{
+  console.log(err)
+  res.status(403).send(err.name)
+}
+})
 
 
 route.get('/registered',async(req,res)=>{
@@ -120,8 +167,9 @@ route.get('/registered',async(req,res)=>{
           where:{
               event_detail_id:eventIdArr
           },
-          include:[{
-              model:student_basic_details
+           include:[{
+              model:company_basic_details
+           
           }]
 
       })    
@@ -130,7 +178,7 @@ route.get('/registered',async(req,res)=>{
       console.log("sending jobs-----------------"+result)
       res.status(201).send(
         {
-          result:result 
+          result:finalresult 
         }
       )
 }
@@ -146,7 +194,78 @@ catch(err)
 }
 })
 
+route.post('/isregistered',async(req,res)=>{
+     console.log("----------getting registered events")
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details ------------------------"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
 
+      })
+      .catch(err =>{
+        console.log(`error posting student journey ${err}`)
+      });
+    
+      const result = await studentevents.findOne({
+
+        where:{
+            student_basic_detail_id:studentId,
+            event_detail_id:req.body.event.event_id
+        }      
+    
+      }
+      )
+      if(result)
+      {
+    console.log("sending jobs-----------------"+result)
+      res.status(201).send(
+        {
+          result:{
+              registered:true
+          } 
+        }
+      )
+      }
+      else{
+          console.log("sending jobs-----------------"+result)
+      res.status(201).send(
+        {
+          result:{
+              registered:false
+          } 
+        }
+      )
+      }
+
+      
+
+        
+      
+     
+      
+}
+catch(err)
+{
+  console.log(`error getting events ${err}`)
+  res.status(500).send({
+    errors: {
+      body: err
+    }
+
+})
+}
+})
 
 
 
