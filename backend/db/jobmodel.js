@@ -64,6 +64,10 @@ const sequelizeconnection = new sequelize('handshake', 'admin', 'admin#123', {
           primaryKey: true,
           autoIncrement: true,
           allowNull: false
+        },
+        job_status:{
+          type:DT.STRING(50),
+          
         }
 
     }
@@ -76,5 +80,7 @@ const sequelizeconnection = new sequelize('handshake', 'admin', 'admin#123', {
 
     student_basic_details.belongsToMany(job,{through:studentjobs,foreignKey:'student_basic_detail_id'})   
     job.belongsToMany(student_basic_details,{through:studentjobs,foreignKey:'job_id'}) 
+    job.hasMany(studentjobs)
+    studentjobs.belongsTo(job)
     
   module.exports={job,studentjobs}

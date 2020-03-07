@@ -338,6 +338,7 @@ route.post('/upload',async  (req, res, next) => {
     const result=await studentjobs.create({
            
              job_id:bookId,
+             jobJobId:bookId,
              student_basic_detail_id:student.student_basic_detail_id
         
     })
@@ -352,5 +353,66 @@ catch(err)
   res.status(403).send(err.name)
 }
 })
+
+route.get('/applied',async(req,res)=>{
+     console.log("----------getting applied jobs")
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details ------------------------"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.name;
+
+      })
+      .catch(err =>{
+        console.log(`error posting student journey ${err}`)
+      });
+    
+     
+
+      const finalresult= await job.findAll({
+         
+           include:[{
+              model:company_basic_details
+        
+          },
+          {
+            model:studentjobs,
+            where:{
+              student_basic_detail_id:studentId
+            }
+          }
+          ]
+
+      })    
+      
+      console.log("sending jobs-----------------"+finalresult)
+      res.status(201).send(
+        {
+          result:finalresult 
+        }
+      )
+}
+catch(err)
+{
+  console.log(`error getting jobs ${err}`)
+  res.status(500).send({
+    errors: {
+      body: err
+    }
+
+})
+}
+})
+
 
 module.exports=route;

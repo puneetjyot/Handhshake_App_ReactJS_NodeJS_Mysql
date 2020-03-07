@@ -39,5 +39,6 @@ app.use("/student/experience", require("./routes/studentexperience"));
 app.use("/company", require("./routes/companyRoutes"));
 app.use("/jobs", require("./routes/jobsRoute"));
 app.use("/events", require("./routes/eventRoute"));
+app.use("/student/profile", require("./routes/profileRoute"));
 module.exports = app;
 // app.listen(3001);

@@ -102,19 +102,37 @@ route.post('/register',async  (req, res, next) => {
       .catch(err =>{
         console.log(`error getting student basic details ${err}`)
       });
-   
-
+    
+    //getting major of current college
+        const current_major_college = await student_education.findOne({
+            where:{
+                student_basic_detail_id:studentId,
+                school_name:student.college
+            }
+        })
+        console.log(current_major_college)
+    let major =current_major_college.dataValues.major;
+    console.log("-------------------------------------------------------",major)
  
-    console.log(student,'-----------------------------------')
+    console.log(student,'-----------------------------------',req.body.event.major)
+
+    if(req.body.event.major.toLowerCase().includes('all')||req.body.event.major.toLowerCase().includes(major.toLowerCase()))
+    {
     const result=await studentevents.create({
            
              event_detail_id:req.body.event.event_id,
              student_basic_detail_id:student.student_basic_detail_id
-        
+    
     })
     if(result)
     {
         res.status(201).send(result)
+    }
+    }
+    else{
+        res.status(403).send({
+            eligible:'Not Eligible'
+        })
     }
 }
 catch(err)
