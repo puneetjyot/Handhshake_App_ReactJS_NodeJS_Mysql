@@ -95,9 +95,9 @@ catch(err)
 
 route.get("/:id", async (req, res) => {
   
-  console.log("In student route"+JSON.stringify(req.headers));
+  console.log("In student route"+req.params.id);
   Decryptedtoken = decryptToken(req.headers.authorization);
-  let studentId, email, name;
+  let studentId, email, name,student;
 
   console.log(Decryptedtoken.email);
   if (Decryptedtoken.email !== null) {
@@ -111,6 +111,7 @@ route.get("/:id", async (req, res) => {
         console.log(
           tokenuser.dataValues.student_basic_detail_id + "in details"
         );
+       
         studentId = tokenuser.dataValues.student_basic_detail_id;
         email = tokenuser.dataValues.emailId;
         name= tokenuser.dataValues.name;
@@ -127,6 +128,14 @@ route.get("/:id", async (req, res) => {
     });
   }
 
+    student=student_basic_details.findOne({
+    where:{
+      student_basic_detail_id:req.params.id
+    }
+  }).then(students=>{
+    console.log(students.dataValues)
+    student=students.dataValues
+  })
   let studentEducations = [];
   let allEducation = student_education
     .findAll({
@@ -140,7 +149,7 @@ route.get("/:id", async (req, res) => {
       for (var i = 0; i < student_educations.length; i++) {
         studentEducations[i] = student_educations[i].dataValues;
       }
-      console.log(studentEducations);
+     // console.log(studentEducations);
     }).catch(err =>{
       console.log(`error getting student education ${err}`)
     });;
@@ -168,6 +177,7 @@ where: {
 // catch(e){
 //   console.log(e)
 // }
+
 student_profile
   .findOne({
     where: {
@@ -175,20 +185,24 @@ student_profile
     }
   })
   .then(studentprofile => {
-    console.log("profile")
-    const studenttoken = generateToken(email);
+    console.log(studentprofile)
+    const studenttoken = generateToken(student.email);
+    if(studentprofile)
+    {
     studentprofile = studentprofile.dataValues;
-    console.log(studentprofile);
+    }
+    console.log(student.email);
     res.status(201).json({
       student: {
-        email: email,
-        name:name,
-        career_objective: studentprofile.career_objective,
-        profile_picture: studentprofile.profile_picture,
+        email: student.emailId,
+        name:student.name,
+        career_objective:studentprofile? studentprofile.career_objective:'',
+        profile_picture: studentprofile? studentprofile.profile_picture:'',
         token: studenttoken,
-        education:studentEducations,
-        profile:studentprofile,
-        experience:studentexperiencesarr
+        education:studentEducations?studentEducations:'',
+        profile:studentprofile?studentprofile:'',
+        experience:studentexperiencesarr?studentexperiencesarr:'',
+        student_basic_details: student
         // education:
         // {
         //   schoolname:studentEducation.school_name,
@@ -208,7 +222,191 @@ student_profile
   });;
 })
 
+route.get("/education/:id", async (req, res) => {
+  console.log(req.body);
+  console.log("In get education");
+  var studentId,student;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.name;
+      })
+      .catch(err => {
+        console.log(`error getting student basic details ${err}`);
+      });
 
+     
+    const preeducation = await student_education.findAll({
+      where: {
+        student_basic_detail_id: req.params.id
+      }
+    });
 
+    if (preeducation) {
+      res.status(201).send(preeducation);
+    } else {
+      res.status(403).send({
+        errors: {
+          err: "Unable to delete school"
+        }
+      });
+    }
+  } catch (err) {
+    console.log(err + "error sdsad");
+    res.status(500).send({
+      errors: {
+        body: "cannot delete as record is not present"
+      }
+    });
+  }
+});
+
+route.get("/skills/:id", async (req, res) => {
+  console.log(req.body);
+  console.log("In get education");
+  var studentId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.name;
+      })
+      .catch(err => {
+        console.log(`error getting student basic details ${err}`);
+      });
+
+    const preeducation = await student_skills.findAll({
+      where: {
+        student_basic_detail_id: req.params.id
+      }
+    });
+
+    if (preeducation) {
+      res.status(201).send(preeducation);
+    } else {
+      res.status(403).send({
+        errors: {
+          err: "Unable to get skills"
+        }
+      });
+    }
+  } catch (err) {
+    console.log(err + "error sdsad");
+    res.status(500).send({
+      errors: {
+        body: "cannot find key as record is not present"
+      }
+    });
+  }
+});
+
+route.get("/journey/:id", async (req, res) => {
+  console.log("----------getting journey");
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id +
+            "in details ------------------------"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.name;
+      })
+      .catch(err => {
+        console.log(`error posting student journey ${err}`);
+      });
+
+    const result = await student_profile.findOne({
+      where: { student_basic_detail_id: req.params.id }
+    });
+    console.log("sending journey-----------------" + result.career_objective);
+    res.status(201).send({
+      result: result.career_objective
+    });
+  } catch (err) {
+    console.log(`error posting student journey ${err}`);
+    res.status(500).send({
+      errors: {
+        body: err
+      }
+    });
+  }
+});
+
+route.get("/experience/:id", async (req, res) => {
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  if (Decryptedtoken.email !== null) {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.name;
+      })
+      .catch(err => {
+        console.log(`error getting student basic details ${err}`);
+      });
+  } else {
+    return res.json({
+      errors: {
+        message: [Decryptedtoken.error]
+      }
+    });
+  }
+  try {
+    const experiencearr = await student_experience.findAll({
+      where: {
+        student_basic_detail_id: studentId
+      }
+    });
+
+    if (experiencearr) {
+      res.status(201).send({
+        experiencearr
+      });
+    }
+  } catch (err) {
+    res.status(403).send({
+      errors: {
+        err: "Unable to delete school"
+      }
+    });
+  }
+});
 
 module.exports=route;

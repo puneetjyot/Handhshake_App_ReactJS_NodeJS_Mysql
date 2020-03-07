@@ -42,6 +42,9 @@ sequelizeconnection.define(
         allowNull:false,
         unique:true
     },
+    phone_number:{
+        type:DT.STRING(50)
+    },
     password:{
         type:DT.STRING(200),
         allowNull:false,

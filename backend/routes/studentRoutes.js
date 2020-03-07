@@ -823,4 +823,63 @@ route.delete("/skills", async (req, res) => {
   }
 });
 
+route.post("/basicdetails", async (req, res) => {
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.name;
+      })
+      .catch(err => {
+        console.log(`error posting student journey ${err}`);
+      });
+
+    const result = await student_profile.update(
+      // { career_objective: req.body.student.career_objective },
+      // { where: { student_basic_detail_id: studentId } }
+      {
+        dob:req.body.basicdetails.dob?req.body.basicdetails.dob:'',
+        studentstate:req.body.basicdetails.studentstate?req.body.basicdetails.studentstate:'',
+        city:req.body.basicdetails.city?req.body.basicdetails.city:'',
+        country:req.body.basicdetails.country?req.body.basicdetails.country:'',
+        email:req.body.basicdetails.email?req.body.basicdetails.email:'',
+        phone:req.body.basicdetails.phone?req.body.basicdetails.phone:''
+      },
+      {where:{student_basic_detail_id:studentId}}
+    );
+    res.status(201).send({
+      result: {
+        "student":{
+          "email":req.body.basicdetails.email?req.body.basicdetails.email:'',
+          "student_basic_details":{
+            
+            "dob": req.body.basicdetails.dob?req.body.basicdetails.dob:'',   
+            "city": req.body.basicdetails.city?req.body.basicdetails.city:'',
+            "state": req.body.basicdetails.studentstate?req.body.basicdetails.studentstate:'',
+            "country": req.body.basicdetails.country?req.body.basicdetails.country:'',
+            "phone_number": req.body.basicdetails.phone?req.body.basicdetails.phone:''
+          }
+        }
+      }
+    });
+  } catch (err) {
+    console.log(`error posting student journey ${err}`);
+    res.status(500).send({
+      errors: {
+        body: err
+      }
+    });
+  }
+});
+
 module.exports = route;
