@@ -40,26 +40,26 @@ var upload = multer({ storage: storage }).single('file')
 
 route.get('/',async(req,res)=>{
      console.log("----------getting jobs")
-  Decryptedtoken = decryptToken(req.headers.authorization);
-  try {
-    await student_basic_details
-      .findOne({
-        where: {
-          emailId: Decryptedtoken.email
-        }
-      })
-      .then(tokenuser => {
-        console.log(
-          tokenuser.dataValues.student_basic_detail_id + "in details ------------------------"
-        );
-        studentId = tokenuser.dataValues.student_basic_detail_id;
-        email = tokenuser.dataValues.emailId;
-        name= tokenuser.dataValues.name;
+  // Decryptedtoken = decryptToken(req.headers.authorization);
+   try {
+  //   await student_basic_details
+  //     .findOne({
+  //       where: {
+  //         emailId: Decryptedtoken.email
+  //       }
+  //     })
+  //     .then(tokenuser => {
+  //       console.log(
+  //         tokenuser.dataValues.student_basic_detail_id + "in details ------------------------"
+  //       );
+  //       studentId = tokenuser.dataValues.student_basic_detail_id;
+  //       email = tokenuser.dataValues.emailId;
+  //       name= tokenuser.dataValues.name;
 
-      })
-      .catch(err =>{
-        console.log(`error posting student journey ${err}`)
-      });
+  //     })
+  //     .catch(err =>{
+  //       console.log(`error posting student journey ${err}`)
+  //     });
     
       const result = await job.findAll({
         include:[{
@@ -111,7 +111,7 @@ route.post('/', async(req,res)=>{
       });
    
       const result=await job.create({
-        job_id:req.body.job.job_id,
+    
         job_title: req.body.job.job_title,
         deadline: req.body.job.deadline,
         location: req.body.job.location,
@@ -125,7 +125,7 @@ route.post('/', async(req,res)=>{
 
       if(result)
       {
-        res.status(201).send(result)
+        res.status(201).send({...result.dataValues,company_basic_detail:{company_name:name}})
       }
       else{
         res.status(403).send(
