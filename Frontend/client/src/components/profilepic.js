@@ -4,6 +4,8 @@ import { updateName, getEducation } from "../redux/actions/profileAction";
 import { connect } from "react-redux";
 import axios from "axios";
 import api_route from "../app-config";
+// import {downloadFileRequest} from '../utils/downloadFilerequest';
+// import fileSaver from 'utils/fileSaver';
 
 
 class ProfilePic extends Component {
@@ -18,7 +20,24 @@ class ProfilePic extends Component {
       propicture:''
     };
   }
-  componentDidMount() {
+ async componentDidMount() {
+
+
+     axios.get(`${api_route.host}/student/picture`) .then(res=> 
+      {
+        console.log('getting picture data from backend',res.data.data.profile_picture);
+        
+      //  var imageURL = 'data:image/png;base64,' + new Buffer(res.data.data.profile_picture, 'binary').toString('base64')
+        var src=`${api_route.host}//res.data.data.profile_picture`
+        console.log(src)
+        this.setState({propicture:src})
+        
+      }).catch(err=>{
+        console.log(err)
+      })
+    
+   
+
     console.log("getting education in mount");
   //  this.props.getEducation();
     let config = {
@@ -34,6 +53,10 @@ class ProfilePic extends Component {
         .then(res => {
           console.log(res.data);
           this.setState({ dataarr: res.data });
+          if(res.data.student.profile_picture){
+          var src=`${api_route.host}//${res.data.student.profile_picture}`
+          this.setState({propicture:src})
+          }
         })
         .catch(err => {
           console.log(err);
@@ -42,30 +65,8 @@ class ProfilePic extends Component {
       console.log(err);
     }
   }
-  // editAfterName=()=>
-  // {
-  //   console.log(this.state.newName)
-  //   let config = {
-  //     headers: {
-  //       Authorization: `${window.localStorage.getItem("student")}`
-  //     }
-  //   };
-  //   console.log("mounting in profile------------");
-  //   try {
-  //     console.log("In try bloc");
-  //     axios
-  //       .get(`${api_route.host}/student/`, config)
-  //       .then(res => {
-  //         console.log(res.data);
-  //         this.setState({ dataarr: res.data.student });
-  //       })
-  //       .catch(err => {
-  //         console.log(err);
-  //       });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
+  
+
 
   handleEdit = async () => {
     await this.props.updateName(this.state.temp);
@@ -78,12 +79,7 @@ class ProfilePic extends Component {
 
   updatePic=(e)=>{
     e.preventDefault();
-    //alert("pro pic change");
     console.log("pro pic change")
-    // var nameofpic=this.state.picture;
-    // nameofpic.append('myimage',nameofpic);
-    // this.setState({picture:nameofpic})
-   // this.setState({picture:this.state.picture.append('myimage',this.state.picture)})
     console.log(this.state.picture)
     let picdata=new FormData();
     picdata.append('myimage',this.state.picture)
@@ -92,12 +88,7 @@ class ProfilePic extends Component {
             Authorization: `${window.localStorage.getItem("student")}`
           }
         };
-        let data= {
-          student:{
-            profile_picture: picdata,
-           
-          }
-        }
+       
         console.log("mounting in picture------------");
         try {
           console.log("In try block");
@@ -105,7 +96,7 @@ class ProfilePic extends Component {
             .post(`${api_route.host}/student/picture`,picdata, config)
             .then(res => {
               console.log(res.data);
-             this.setState({ picture: res.data.picture });
+             this.setState({ propicture: res.data.name });
             })
             .catch(err => {
               console.log(err);
@@ -129,9 +120,12 @@ class ProfilePic extends Component {
           <div className="col-12 col-md-offset-1 shadow_style">
             <div className="card">
               <div align="center" className="mt-2">
-              {console.log("Picture here")}
-              {this.state.propicture!=''?
-              <img src={this.state.propicture} />:
+              {console.log(api_route.host/this.state.propicture)}
+              {this.state.propicture?
+              <div className="style__edit-photo___B-_os">
+              <img src={this.state.propicture}/>
+              </div>
+              :
               <form onSubmit={this.updatePic}>
               <div>
                 <button className="style__edit-photo___B-_os">
@@ -145,10 +139,6 @@ class ProfilePic extends Component {
                  
                   <div>
                     {" "}
-                    {/* <p style={{ color: "#1569e0", fontSize: "13px" }}>
-                      Add Photo
-
-                    </p> */}
                    
                     <input style={{ color: "#1569e0", fontSize: "13px" }} type='file' name='file' onChange={e=>{
                       console.log(e.target.files[0])

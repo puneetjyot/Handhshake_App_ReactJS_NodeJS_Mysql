@@ -78,7 +78,7 @@ const student_profile=
                 type:DT.STRING(200)
             },
             profile_picture:{
-                type:DT.BLOB
+                type:DT.STRING(200)
             },
             resume:{
                 type:DT.STRING(200)

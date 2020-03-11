@@ -235,7 +235,7 @@ route.get("/applicants", async (req, res) => {
   }
 });
 
-route.post("/upload",upload.single('myimage'), async (req, res, next) => {
+route.post("/upload/:id",upload.single('myimage'), async (req, res, next) => {
   console.log(req.body);
   console.log("applying for job");
   var studentId;
@@ -265,24 +265,14 @@ route.post("/upload",upload.single('myimage'), async (req, res, next) => {
     var bookId = req.body.id;
     let file = req.files.file;
       
-  //   upload(req, res, function(err) {
-  //     console.log("here in uploading file");
-  //  //   console.log(req.files);
-  //     if (err instanceof multer.MulterError) {
-  //       return res.status(500).json(err);
-  //     } else if (err) {
-  //       return res.status(500).json(err);
-  //     }
-  //     console.log(req.file);
-  //     //  return res.status(200).send(req.file)
-  //   });
+
     console.log(req.files.file.name+
       "hhjhjhjghjgjgjgjhghjj")
 
    // console.log(student, "-----------------------------------", bookId);
     const result = await studentjobs.create({
-      job_id: bookId,
-      jobJobId: bookId,
+      job_id: req.params.id,
+      jobJobId: req.params.id,
       student_basic_detail_id: student.student_basic_detail_id,
       resume:req.files.file
     });
@@ -290,7 +280,7 @@ route.post("/upload",upload.single('myimage'), async (req, res, next) => {
       res.status(201).send(result);
     }
   } catch (err) {
-    console.log(err.message);
+    console.log(err);
     res.status(403).send(err.name);
   }
 });
@@ -415,7 +405,62 @@ route.get("/:id/students", async (req, res) => {
 });
 
 
-route.get('/:jobId/:studentId')
+route.post('/:jobId/:studentId',async(req,res)=>{
+  try {
+    console.log(req.body.company.status)
+    Decryptedtoken = decryptToken(req.headers.authorization);
+    await company_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.company_basic_detail_id +
+            "in details ------------------------"
+        );
+        companyId = tokenuser.dataValues.company_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.company_name;
+      })
+      .catch(err => {
+        console.log(`getting students who applied for this job ${err}`);
+      });
+
+
+    connection.query(
+      `update studentjobs set job_status=? where job_id=? and student_basic_detail_id=?`,
+      [req.body.company.status,req.params.jobId,req.params.studentId],
+      (err, results, fields) => {
+        if (err) {
+          console.log(err);
+          res.send({
+            
+            success: false,
+            msg: "Something went wrong",
+            msgDesc: err
+          });
+        } else {
+          res.send({
+            success: true,
+            msg: "Successfully fetched student profile",
+            msgDesc: results
+          });
+        }
+      }
+    );
+
+   
+  } catch (err) {
+    console.log(`error getting jobs ${err}`);
+    res.status(500).send({
+      errors: {
+        body: err
+      }
+    });
+  }
+})
 
 
 module.exports = route;

@@ -28,7 +28,7 @@ class JobDescription extends Component {
     
    console.log(data)
   
-    axios.post(`${api_route.host}/jobs/upload`,data,config,{
+    axios.post(`${api_route.host}/jobs/upload/${jobId}`,data,config,{
 
     })
     .then((res)=>{

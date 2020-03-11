@@ -5,6 +5,7 @@ const { generateUUID } = require("../service/uuidservice");
 const passport = require("../authenticate/passport_init");
 const key = require("../service/key");
 var multer = require("multer");
+var fs = require('fs');
 const {
   validateUsername,
   validatePassword,
@@ -24,13 +25,13 @@ const {
 } = require("../db/studentmodel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-
+const date=Date.now()
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, "public");
   },
   filename: function(req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, date + "-" + file.originalname);
   }
 });
 
@@ -626,8 +627,8 @@ route.get("/education", async (req, res) => {
 
 route.post("/picture",upload.single('myimage'), async (req, res) => {
   console.log(JSON.stringify(req.file)+" file post");
-  console.log(req.files+" files post");
-  console.log("In updating name");
+ 
+ 
   var studentId;
   Decryptedtoken = decryptToken(req.headers.authorization);
   try {
@@ -649,13 +650,16 @@ route.post("/picture",upload.single('myimage'), async (req, res) => {
         console.log(`error getting student basic details ${err}`);
       });
 
+    //  var imageData = fs.readFileSync(req.file.path);
+     // console.log(imageData)
     const result = await student_profile.update(
-      { profile_picture: req.file },
+      { profile_picture: date + "-" + req.file.originalname },
       { where: { student_basic_detail_id: studentId } }
     );
 
     if (result) {
-      //  res.status(201).send({picture:{req.body.student.profile_picture}})
+      console.log(result)
+        res.status(201).send({name:date + "-" + req.file.originalname});
     } else {
       res.status(403).send({
         errors: {
@@ -663,6 +667,49 @@ route.post("/picture",upload.single('myimage'), async (req, res) => {
         }
       });
     }
+  } catch (err) {
+    console.log(err);
+    res.status(403).send({
+      errors: {
+        err: err
+      }
+    });
+  }
+});
+
+
+route.get('/picture',async(req,res)=>{
+
+  var studentId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+  .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.name;
+      })
+      .catch(err => {
+        console.log(`error getting student basic details ${err}`);
+      });
+
+      student_profile.findOne({
+        where:{student_basic_detail_id:studentId}
+      })
+      .then(profile => {
+        res.json({ success: true, data: profile })
+      })
+      .catch(err => {
+        console.log('in error :: /api/getProfilePic')
+      })
   } catch (err) {
     console.log(err);
     res.status(403).send({
@@ -697,7 +744,7 @@ route.post("/skills", async (req, res) => {
         console.log(`error getting student basic details ${err}`);
       });
 
-    console.log(req.body.student.skill_name);
+  //  console.log(req.body.student.skill_name);
     const result = await student_skills.create({
       student_basic_detail_id: studentId,
       skill_name: req.body.student.skill_name
@@ -727,8 +774,8 @@ route.post("/skills", async (req, res) => {
 ///// Get for skills
 
 route.get("/skills", async (req, res) => {
-  console.log(req.body);
-  console.log("In get education");
+  // console.log(req.body);
+  // console.log("In get education");
   var studentId;
   Decryptedtoken = decryptToken(req.headers.authorization);
   try {
@@ -776,8 +823,8 @@ route.get("/skills", async (req, res) => {
 });
 
 route.delete("/skills", async (req, res) => {
-  console.log();
-  console.log("In deleting name");
+  // console.log();
+  // console.log("In deleting name");
   var studentId;
   Decryptedtoken = decryptToken(req.headers.authorization);
   try {

@@ -12,7 +12,7 @@ class StudentJobList extends Component {
     perStudentArr: [],
     redirect: false,
     id: "",
-    value:'Pending'
+    value: "Pending"
   };
 
   componentDidMount() {
@@ -58,7 +58,7 @@ class StudentJobList extends Component {
     });
     this.setState({ studentarr: result });
   };
-  changeStatus = (jobid,studentid) =>{
+  changeStatus = (jobid, studentid) => {
     let config = {
       headers: {
         Authorization: `${window.localStorage.getItem("company")}`
@@ -66,23 +66,17 @@ class StudentJobList extends Component {
     };
     let data = {
       company: {
-       status:this.state.value
+        status: this.state.value
       }
     };
-    console.log("mounting in Student List------------");
+    console.log("changing  Student status------------");
     //this.setState({educationarr:this.props.educationData})
     try {
-      console.log("In try bloc");
-    axios
-        .post(
-          `${api_route.host}/jobs/${jobid}/${studentid}`,
-          config
-        )
+      console.log(this.state.value);
+      axios
+        .post(`${api_route.host}/jobs/${jobid}/${studentid}`, data, config)
         .then(res => {
-          this.setState({ studentarr: res.data.msgDesc });
-          this.setState({ perStudentArr: res.data.msgDesc });
-          //  this.setState({studentobj:res.data.msgDesc[0]})
-          console.log(res.data.msgDesc);
+          console.log(res.data);
         })
         .catch(err => {
           console.log(err);
@@ -90,7 +84,7 @@ class StudentJobList extends Component {
     } catch (err) {
       console.log(err);
     }
-  }
+  };
   filterMajor = value => {
     let result = [];
     console.log(value);
@@ -249,65 +243,91 @@ class StudentJobList extends Component {
                                     textDecoration: "underline",
                                     cursor: "pointer"
                                   }}
-                                  
                                 >
-                                <div className=' d-flex justify-content-between'>
-                                  <div onClick={e => {
-                                    this.setRedirect(i.student_basic_detail_id);
-                                    this.setState({
-                                      id: i.student_basic_detail_id
-                                    });
-                                  }}>
-                                  <h3
-                                    className="ml-5"
-                                    style={{
-                                      fontSize: "20px",
-                                      fontWeight: "600"
+                                  <div className=" d-flex justify-content-between">
+                                    <div
+                                      onClick={e => {
+                                        this.setRedirect(
+                                          i.student_basic_detail_id
+                                        );
+                                        this.setState({
+                                          id: i.student_basic_detail_id
+                                        });
+                                      }}
+                                    >
+                                      <h3
+                                        className="ml-5"
+                                        style={{
+                                          fontSize: "20px",
+                                          fontWeight: "600"
+                                        }}
+                                      >
+                                        {" "}
+                                        {i ? i.name : ""}
+                                      </h3>
+                                    </div>
+                                    <div className="ml-5 col-3">
+                                      <select
+                                        className="form-control"
+                                        style={{ textDecoration: "none" }}
+                                        value={this.state.value}
+                                        onChange={e => {
+                                          this.setState(
+                                            { value: e.target.value },
+                                            () => {
+                                              this.changeStatus(
+                                                i.job_id,
+                                                i.student_basic_detail_id
+                                              );
+                                            }
+                                          );
+                                        }}
+                                      >
+                                        <option value="Pending">Pending</option>
+                                        <option value="Reviewed">
+                                          Reviewed
+                                        </option>
+                                        <option value="Accepted">
+                                          Accepted
+                                        </option>
+                                        <option value="Declined">
+                                          Declined
+                                        </option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div
+                                    onClick={e => {
+                                      this.setRedirect(
+                                        i.student_basic_detail_id
+                                      );
+                                      this.setState({
+                                        id: i.student_basic_detail_id
+                                      });
                                     }}
                                   >
-                                    {" "}
-                                    {i ? i.name : ""}
-                                  </h3>
+                                    <h3
+                                      className="ml-5"
+                                      style={{
+                                        fontSize: "16px",
+                                        fontWeight: "400"
+                                      }}
+                                    >
+                                      {" "}
+                                      {i ? i.college : ""}
+                                    </h3>
                                   </div>
-                                  <div className='ml-5 col-3'>
-                                    <select className="form-control" style = {{textDecoration:'none'}}  value={this.state.value} onChange= {e =>{
-                                         this.setState({value: e.target.value});
-                                         this.changeStatus(i.job_id,i.student_basic_detail_id)
-                                    }}>
-                                      <option selected value="Pending">
-                                      Pending
-                                      </option>
-                                      <option value="Reviewed">Reviewed</option>
-                                      <option value="Accepted">
-                                      Accepted
-                                      </option>
-                                      <option value="Declined">Declined</option>
-                                    </select>
-                                    </div>
-                                    </div>
-                                 <div onClick={e => {
-                                    this.setRedirect(i.student_basic_detail_id);
-                                    this.setState({
-                                      id: i.student_basic_detail_id
-                                    });
-                                  }}>
-                                  <h3
-                                    className="ml-5"
-                                    style={{
-                                      fontSize: "16px",
-                                      fontWeight: "400"
+                                  <div
+                                    className="d-flex justify-content-between"
+                                    onClick={e => {
+                                      this.setRedirect(
+                                        i.student_basic_detail_id
+                                      );
+                                      this.setState({
+                                        id: i.student_basic_detail_id
+                                      });
                                     }}
                                   >
-                                    {" "}
-                                    {i ? i.college : ""}
-                                  </h3>
-                                  </div>
-                                  <div className="d-flex justify-content-between" onClick={e => {
-                                    this.setRedirect(i.student_basic_detail_id);
-                                    this.setState({
-                                      id: i.student_basic_detail_id
-                                    });
-                                  }}>
                                     <h3
                                       className="ml-5"
                                       style={{

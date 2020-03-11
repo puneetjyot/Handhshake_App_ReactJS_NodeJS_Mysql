@@ -33,7 +33,7 @@ app.use(express.urlencoded({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
-
+app.use(express.static('public'));
 app.use("/student", require("./routes/studentRoutes"));
 app.use("/student/experience", require("./routes/studentexperience"));
 app.use("/company", require("./routes/companyRoutes"));
