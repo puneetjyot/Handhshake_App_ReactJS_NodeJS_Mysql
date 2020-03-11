@@ -12,23 +12,22 @@ import { connect } from "react-redux";
 class MainVisitedProfile extends Component {
   state = {};
   componentDidMount(){
+
    // this.props.getEducation();
+   console.log(localStorage.getItem('visitedstudent'))
   }
   render() {
    
-    if (!localStorage.getItem('student')) {
-      return <Redirect to="/student/login" />;
-    }
-    else{
-        // this.props.getEducation()
-    }
+   
+   
     return (
       <div className="d-flex container">
         <div className="row">
           <div className="col-4">
+          
             <VisitedProfilePic profileData={this.props.educationarr} />
             <VisitedSkills/>
-            <VisitedPersonalInfo personalData={this.props.educationarr} />
+             <VisitedPersonalInfo personalData={this.props.educationarr} /> 
           </div>
           <div className="col-8">
             <VisitedJourney />

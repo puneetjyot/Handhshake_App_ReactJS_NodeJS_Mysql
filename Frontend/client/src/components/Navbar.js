@@ -166,14 +166,7 @@ class Navbar extends Component {
             jobs
           </a>
           :
-           <a
-          className=
-         {liClasses}
-         style={{ fontWeight: "500",color:'rgba(0,0,0,.5)' }}
-            href="/company/jobs"
-          >
-            jobs
-          </a>
+          ''
           }
           </div>
           <div>

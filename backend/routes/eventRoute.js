@@ -4,7 +4,7 @@ const { generateToken, decryptToken } = require("../service/tokenservice");
 const { generateUUID } = require("../service/uuidservice");
 const passport = require("../authenticate/passport_init");
 const key = require("../service/key");
-
+var connection = require("../db_connection");
 const {
   student_basic_details
   // student_profile,
@@ -46,7 +46,7 @@ route.get('/',async(req,res)=>{
 
       })
       .catch(err =>{
-        console.log(`error posting student journey ${err}`)
+        console.log(`getting joibs ${err}`)
       });
     
       const result = await event.findAll({
@@ -163,7 +163,7 @@ route.get('/registered',async(req,res)=>{
 
       })
       .catch(err =>{
-        console.log(`error posting student journey ${err}`)
+        console.log(`register for event ${err}`)
       });
     
       const result = await studentevents.findAll({
@@ -232,7 +232,7 @@ route.post('/isregistered',async(req,res)=>{
 
       })
       .catch(err =>{
-        console.log(`error posting student journey ${err}`)
+        console.log(`error while getting if register  ${err}`)
       });
     
       const result = await studentevents.findOne({
@@ -284,6 +284,130 @@ catch(err)
 })
 }
 })
+
+
+
+route.get("/:id/students", async (req, res) => {
+  console.log("----------getting all students");
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await company_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.company_basic_detail_id +
+            "in details ------------------------"
+        );
+        studentId = tokenuser.dataValues.company_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.company_name;
+      })
+      .catch(err => {
+        console.log(`getting students who applied for this job ${err}`);
+      });
+
+    connection.query(
+      `SELECT 
+         a.*,b.*,e.*
+     FROM
+         handshake.student_basic_details as a
+        
+          INNER JOIN
+         studentevents b ON a.student_basic_detail_id = b.student_basic_detail_id
+             INNER JOIN
+         handshake.student_educations e
+     ON
+         a.college = e.school_name
+             AND a.student_basic_detail_id = e.student_basic_detail_id
+             where b.event_detail_id=?
+             `,
+      [req.params.id],
+      (err, results, fields) => {
+        if (err) {
+          res.send({
+            success: false,
+            msg: "Something went wrong",
+            msgDesc: err
+          });
+        } else {
+          res.send({
+            success: true,
+            msg: "Successfully fetched student registered for events",
+            msgDesc: results
+          });
+        }
+      }
+    );
+
+  } catch (err) {
+    console.log(`error getting jobs ${err}`);
+    res.status(500).send({
+      errors: {
+        body: err
+      }
+    });
+  }
+});
+
+route.post('/', async(req,res)=>{
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await company_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.company_basic_detail_id +
+            "in details ------------------------"
+        );
+        companyId = tokenuser.dataValues.company_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.company_name;
+      })
+      .catch(err => {
+        console.log(`posting events ${err}`);
+      });
+
+    const result = await event.create({
+      event_name: req.body.event.event_name,
+      event_time: req.body.event.event_time,
+      location: req.body.event.location,
+      eligibility: req.body.event.eligibility,
+      date: req.body.event.date,
+      event_description: req.body.event.event_description,
+      company_basic_detail_id: companyId
+    });
+
+    if (result) {
+      res
+        .status(201)
+        .send({
+          ...result.dataValues,
+          company_basic_detail: { company_name: name }
+        });
+    } else {
+      res.status(403).send({
+        errors: {
+          err: "Unable to add event"
+        }
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(403).send({
+      errors: {
+        err: err
+      }
+    });
+  }
+});
 
 
 

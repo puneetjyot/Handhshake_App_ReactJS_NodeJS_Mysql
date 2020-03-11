@@ -9,6 +9,7 @@ const { company_basic_details }  = require('../db/index');
 const jwt = require('jsonwebtoken');
 var connection = require('../db_connection');
 const bcrypt = require('bcrypt');
+var multer = require("multer");
 const {
   student_basic_details
   // student_profile,
@@ -100,33 +101,33 @@ route.get("/:id", async (req, res) => {
   let studentId, email, name,student;
 
   console.log(Decryptedtoken.email);
-  if (Decryptedtoken.email !== null) {
-    await student_basic_details
-      .findOne({
-        where: {
-          emailId: Decryptedtoken.email
-        }
-      })
-      .then(tokenuser => {
-        console.log(
-          tokenuser.dataValues.student_basic_detail_id + "in details"
-        );
+  // if (Decryptedtoken.email !== null) {
+  //   await student_basic_details
+  //     .findOne({
+  //       where: {
+  //         emailId: Decryptedtoken.email
+  //       }
+  //     })
+  //     .then(tokenuser => {
+  //       console.log(
+  //         tokenuser.dataValues.student_basic_detail_id + "in details"
+  //       );
        
-        studentId = tokenuser.dataValues.student_basic_detail_id;
-        email = tokenuser.dataValues.emailId;
-        name= tokenuser.dataValues.name;
+  //       studentId = tokenuser.dataValues.student_basic_detail_id;
+  //       email = tokenuser.dataValues.emailId;
+  //       name= tokenuser.dataValues.name;
 
-      })
-      .catch(err =>{
-        console.log(`error getting student basic details ${err}`)
-      });
-  } else {
-    return res.json({
-      errors: {
-        message: [Decryptedtoken.error]
-      }
-    });
-  }
+  //     })
+  //     .catch(err =>{
+  //       console.log(`error getting student basic details ${err}`)
+  //     });
+  // } else {
+  //   return res.json({
+  //     errors: {
+  //       message: [Decryptedtoken.error]
+  //     }
+  //   });
+  // }
 
     student=student_basic_details.findOne({
     where:{
@@ -362,36 +363,11 @@ route.get("/journey/:id", async (req, res) => {
 });
 
 route.get("/experience/:id", async (req, res) => {
-  Decryptedtoken = decryptToken(req.headers.authorization);
-  if (Decryptedtoken.email !== null) {
-    await student_basic_details
-      .findOne({
-        where: {
-          emailId: Decryptedtoken.email
-        }
-      })
-      .then(tokenuser => {
-        console.log(
-          tokenuser.dataValues.student_basic_detail_id + "in details"
-        );
-        studentId = tokenuser.dataValues.student_basic_detail_id;
-        email = tokenuser.dataValues.emailId;
-        name = tokenuser.dataValues.name;
-      })
-      .catch(err => {
-        console.log(`error getting student basic details ${err}`);
-      });
-  } else {
-    return res.json({
-      errors: {
-        message: [Decryptedtoken.error]
-      }
-    });
-  }
+  
   try {
     const experiencearr = await student_experience.findAll({
       where: {
-        student_basic_detail_id: studentId
+        student_basic_detail_id: req.params.id
       }
     });
 

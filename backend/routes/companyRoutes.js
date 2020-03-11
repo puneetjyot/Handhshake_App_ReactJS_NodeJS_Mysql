@@ -141,7 +141,7 @@ route.post('/details', async(req,res)=>{
 
      })
      .catch(err =>{
-       console.log(`error posting student journey ${err}`)
+       console.log(`error getting company details ${err}`)
      });
   
      const result=await company_profile.create({
@@ -186,7 +186,7 @@ catch(err)
 })
 
 route.get('/', async(req,res)=>{
- console.log("----------posting company details")
+ console.log("----------getting company details")
  Decryptedtoken = decryptToken(req.headers.authorization);
  try {
    await company_basic_details
@@ -207,7 +207,7 @@ route.get('/', async(req,res)=>{
 
      })
      .catch(err =>{
-       console.log(`error posting student journey ${err}`)
+       console.log(`error getting company details ${err}`)
      });
   console.log(companyId)
      const result=await company_profile.findOne({
@@ -340,7 +340,7 @@ route.put("/", async (req, res) => {
 
      })
      .catch(err =>{
-       console.log(`error posting student journey ${err}`)
+       console.log(`in company route getting company details ${err}`)
      });
   console.log(companyId)
      const getProfileresult=await company_profile.findOne({

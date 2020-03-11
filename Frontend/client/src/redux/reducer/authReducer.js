@@ -43,6 +43,7 @@ const authReducer=(state=initState,action)=>{
         case LOGOUTSTUDENT:{
             console.log("logging out student")
             localStorage.removeItem('student')
+            if(localStorage.getItem("visitedstudent")){localStorage.removeItem('visitedstudent')}
             return{
                 authStudent:false
             }
@@ -50,6 +51,7 @@ const authReducer=(state=initState,action)=>{
         case LOGOUTCOMPANY:{
             console.log("logging out company")
             localStorage.removeItem('company')
+            if(localStorage.getItem('jobid')){localStorage.removeItem('jobid')}
             return{
                 authCompany:false
             }

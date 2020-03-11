@@ -3,6 +3,7 @@ import api_route from "../../app-config";
 import axios from "axios";
 import "../../styles/profilepic.css";
 import "../../styles/company.css";
+import { Redirect } from "react-router-dom";
 
 class CompanyHome extends Component {
   state = {
@@ -23,7 +24,8 @@ class CompanyHome extends Component {
     salary:'',
     deadline:'',
     jobdescription:'',
-    addSuccessMsg:''
+    addSuccessMsg:'',
+    id:''
   };
   componentDidMount() {
     let config = {
@@ -92,6 +94,47 @@ class CompanyHome extends Component {
     });
     this.setState({ jobarr: result });
   };
+
+  setRedirect = () => {
+    this.setState({
+      redirect: true
+    });
+  };
+  renderRedirect = () => {
+      console.log("in redirecting")
+    if (this.state.redirect) {
+        localStorage.setItem('jobid',this.state.id)
+      return <Redirect to={`/job/student/${this.state.id}`} />;
+    }
+  };
+
+  getStudents= (jobId) =>{
+    // let config = {
+    //   headers: {
+    //     Authorization: `${window.localStorage.getItem("company")}`
+    //   }
+    // };
+    // console.log("mounting in education------------");
+    // //this.setState({educationarr:this.props.educationData})
+    // try {
+    //   console.log("In try bloc");
+    //   axios
+    //     .get(`${api_route.host}/jobs/${jobId}/students`, config)
+    //     .then(res => {
+    //       this.setState({ companyobj: res.data.company });
+    //       console.log(res.data);
+         
+       
+       
+    //     })
+    //     .catch(err => {
+    //       console.log(err);
+    //     });
+    // } catch (err) {
+    //   console.log(err);
+    // }
+
+  }
 
   filterByLocation = value => {
     let result = [];
@@ -174,6 +217,7 @@ class CompanyHome extends Component {
   render() {
     return (
       <div>
+        {this.renderRedirect()}
         <div className="container d-flex mt-3 p-2 pb-5">
           <div className="col-3">
             <div className="card mt-3">
@@ -612,8 +656,8 @@ class CompanyHome extends Component {
                       <div key={i.job_id}>
                         <div
                           className="style__selected___1DMZ3 p-2 mt-3 jobdiv m-1 card"
-                          onClick={e => {
-                            this.setState({ jobobj: i });
+                          onClick={e=>{this.setRedirect(i.job_id)
+                                  this.setState({id:i.job_id})
                           }}
                         >
                           <div className="d-flex">

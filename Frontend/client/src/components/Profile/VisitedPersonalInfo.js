@@ -14,6 +14,10 @@ class VisitedPersonalInfo extends Component {
       phone:''
   };
 
+  componentWillReceiveProps(nextProps)
+  {
+    console.log("In personal info")
+  }
   componentDidMount()
   {
     console.log("getting education in mount");
@@ -24,9 +28,11 @@ class VisitedPersonalInfo extends Component {
         }
       };
       console.log("mounting in personal info------------");
-      try {
-        console.log("In try bloc");
-        axios
+      
+        setTimeout(()=>{
+          try {
+            console.log("In try bloc");
+          axios
           .get(`${api_route.host}/student/profile/${window.localStorage.getItem('visitedstudent')}`, config)
           .then(res => {
             console.log(res.data);
@@ -37,7 +43,7 @@ class VisitedPersonalInfo extends Component {
           });
       } catch (err) {
         console.log(err);
-      }
+      }},1000)
   }
 
     submitDetails()

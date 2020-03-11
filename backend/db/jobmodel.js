@@ -66,8 +66,11 @@ const sequelizeconnection = new sequelize('handshake', 'admin', 'admin#123', {
           allowNull: false
         },
         job_status:{
-          type:DT.STRING(50),
+          type:DT.STRING(50)
           
+        },
+        resume:{
+          type:DT.BLOB
         }
 
     }

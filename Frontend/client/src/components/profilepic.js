@@ -4,7 +4,7 @@ import { updateName, getEducation } from "../redux/actions/profileAction";
 import { connect } from "react-redux";
 import axios from "axios";
 import api_route from "../app-config";
-import FormData from 'form-data'
+
 
 class ProfilePic extends Component {
   constructor(props) {
@@ -89,8 +89,7 @@ class ProfilePic extends Component {
     picdata.append('myimage',this.state.picture)
     let config = {
           headers: {
-            Authorization: `${window.localStorage.getItem("student")}`,
-              'content-type': 'multipart/form-data'
+            Authorization: `${window.localStorage.getItem("student")}`
           }
         };
         let data= {

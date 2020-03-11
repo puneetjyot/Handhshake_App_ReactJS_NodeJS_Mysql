@@ -34,7 +34,7 @@ var storage = multer.diskStorage({
   }
 });
 
-var upload = multer({ storage: storage }).single("file");
+var upload = multer({ storage: storage });
 
 route.get("/", async (req, res) => {
   console.log("----------getting jobs");
@@ -92,7 +92,7 @@ route.post("/", async (req, res) => {
       })
       .then(tokenuser => {
         console.log(
-          tokenuser.dataValues.student_basic_detail_id +
+          tokenuser.dataValues.company_basic_detail_id +
             "in details ------------------------"
         );
         companyId = tokenuser.dataValues.company_basic_detail_id;
@@ -100,7 +100,7 @@ route.post("/", async (req, res) => {
         name = tokenuser.dataValues.company_name;
       })
       .catch(err => {
-        console.log(`error posting student journey ${err}`);
+        console.log(`posting jobs ${err}`);
       });
 
     const result = await job.create({
@@ -213,7 +213,7 @@ route.get("/applicants", async (req, res) => {
         name = tokenuser.dataValues.company_name;
       })
       .catch(err => {
-        console.log(`error posting student journey ${err}`);
+        console.log(`applicants ${err}`);
       });
 
     const result = await job.findAll({
@@ -235,7 +235,7 @@ route.get("/applicants", async (req, res) => {
   }
 });
 
-route.post("/upload", async (req, res, next) => {
+route.post("/upload",upload.single('myimage'), async (req, res, next) => {
   console.log(req.body);
   console.log("applying for job");
   var studentId;
@@ -260,34 +260,37 @@ route.post("/upload", async (req, res, next) => {
       .catch(err => {
         console.log(`error getting student basic details ${err}`);
       });
-
+    //  console.log(JSON.stringify(req.files)+"these are files")
     console.log(req.body.id + "this is the id");
     var bookId = req.body.id;
     let file = req.files.file;
+      
+  //   upload(req, res, function(err) {
+  //     console.log("here in uploading file");
+  //  //   console.log(req.files);
+  //     if (err instanceof multer.MulterError) {
+  //       return res.status(500).json(err);
+  //     } else if (err) {
+  //       return res.status(500).json(err);
+  //     }
+  //     console.log(req.file);
+  //     //  return res.status(200).send(req.file)
+  //   });
+    console.log(req.files.file.name+
+      "hhjhjhjghjgjgjgjhghjj")
 
-    upload(req, res, function(err) {
-      console.log("here in uploading file");
-      console.log(req.files);
-      if (err instanceof multer.MulterError) {
-        return res.status(500).json(err);
-      } else if (err) {
-        return res.status(500).json(err);
-      }
-      console.log(req.file);
-      //  return res.status(200).send(req.file)
-    });
-
-    console.log(student, "-----------------------------------", bookId);
+   // console.log(student, "-----------------------------------", bookId);
     const result = await studentjobs.create({
       job_id: bookId,
       jobJobId: bookId,
-      student_basic_detail_id: student.student_basic_detail_id
+      student_basic_detail_id: student.student_basic_detail_id,
+      resume:req.files.file
     });
     if (result) {
       res.status(201).send(result);
     }
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
     res.status(403).send(err.name);
   }
 });
@@ -312,7 +315,7 @@ route.get("/applied", async (req, res) => {
         name = tokenuser.dataValues.name;
       })
       .catch(err => {
-        console.log(`error posting student journey ${err}`);
+        console.log(`applying for jobs ${err}`);
       });
 
     const finalresult = await job.findAll({
@@ -363,15 +366,9 @@ route.get("/:id/students", async (req, res) => {
         name = tokenuser.dataValues.company_name;
       })
       .catch(err => {
-        console.log(`error posting student journey ${err}`);
+        console.log(`getting students who applied for this job ${err}`);
       });
 
-    //   const result = await student_education.findAll({
-    //       include:[{
-    //             model:student_basic_details,
-    //             where:{school_name:student_basic_details.college}
-    //       }]
-    //   });
 
     connection.query(
       `SELECT 
@@ -406,12 +403,7 @@ route.get("/:id/students", async (req, res) => {
       }
     );
 
-    //   console.log("sending jobs-----------------"+result)
-    //   res.status(201).send(
-    //     {
-    //       result:result
-    //     }
-    //   )
+   
   } catch (err) {
     console.log(`error getting jobs ${err}`);
     res.status(500).send({
@@ -421,5 +413,9 @@ route.get("/:id/students", async (req, res) => {
     });
   }
 });
+
+
+route.get('/:jobId/:studentId')
+
 
 module.exports = route;

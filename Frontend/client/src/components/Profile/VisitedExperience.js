@@ -35,7 +35,7 @@ class VisitedExperience extends Component {
         Authorization: `${window.localStorage.getItem("student")}`
       }
     };
-    console.log("mounting in education------------");
+    console.log("mounting in education------------",window.localStorage.getItem('visitedstudent'));
     //this.setState({educationarr:this.props.educationData})
     try {
       console.log("In try bloc");
