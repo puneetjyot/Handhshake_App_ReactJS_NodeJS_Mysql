@@ -2,7 +2,7 @@ const mysql = require('mysql2');
 
 // create the connection to database
 var connection = mysql.createPool({
-    connectionLimit: 10,
+    connectionLimit: 50,
     host: 'handshake.chf9uwuchcb3.us-east-1.rds.amazonaws.com',
     port: '3306',
     user: 'admin',

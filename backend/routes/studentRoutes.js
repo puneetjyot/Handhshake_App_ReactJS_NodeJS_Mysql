@@ -5,7 +5,9 @@ const { generateUUID } = require("../service/uuidservice");
 const passport = require("../authenticate/passport_init");
 const key = require("../service/key");
 var multer = require("multer");
-var fs = require('fs');
+const { job, studentjobs } = require("../db/jobmodel");
+var connection = require("../db_connection");
+
 const {
   validateUsername,
   validatePassword,
@@ -31,13 +33,15 @@ var storage = multer.diskStorage({
     cb(null, "public");
   },
   filename: function(req, file, cb) {
-    cb(null, date + "-" + file.originalname);
+    cb(null,  file.originalname);
   }
 });
 
 var upload = multer({ storage: storage });
 
-
+route.get('/servercheck' ,(req,res)=>{
+  res.status(200).send('Welcome to Handshake server')
+  })
 
 route.get("/", async (req, res) => {
   console.log("In student route" + JSON.stringify(req.headers));
@@ -183,7 +187,8 @@ route.post(
           email: registerStudent.email,
           name: registerStudent.name,
           image: null,
-          token: studenttoken
+          token: studenttoken,
+          isRegister:true
         }
       });
     } catch (err) {
@@ -270,7 +275,8 @@ route.post("/login", validateEmail, validatePassword, async (req, res) => {
               emailId: student.email,
               name: student.name,
               image: null,
-              token: studenttoken
+              token: studenttoken,
+              isLogin:true
             }
           });
         }
@@ -292,7 +298,8 @@ route.post("/login", validateEmail, validatePassword, async (req, res) => {
 });
 
 route.get("/journey", async (req, res) => {
-  console.log("----------getting journey");
+  // console.log("----------getting journey");
+  // Decryptedtoken = decryptToken(req.headers.authorization);
   Decryptedtoken = decryptToken(req.headers.authorization);
   try {
     await student_basic_details
@@ -653,13 +660,13 @@ route.post("/picture",upload.single('myimage'), async (req, res) => {
     //  var imageData = fs.readFileSync(req.file.path);
      // console.log(imageData)
     const result = await student_profile.update(
-      { profile_picture: date + "-" + req.file.originalname },
+      { profile_picture: req.file.originalname },
       { where: { student_basic_detail_id: studentId } }
     );
 
     if (result) {
       console.log(result)
-        res.status(201).send({name:date + "-" + req.file.originalname});
+        res.status(201).send({name:req.file.originalname});
     } else {
       res.status(403).send({
         errors: {
@@ -943,5 +950,51 @@ route.post("/basicdetails", async (req, res) => {
     });
   }
 });
+
+
+route.post("/upload/:id",upload.single('myimage'), async (req, res) => {
+  
+  console.log(req.file,"filee");
+  console.log("applying for job");
+  var studentId;
+  var student;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await student_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.student_basic_detail_id + "in details"
+        );
+        student = tokenuser.dataValues;
+        studentId = tokenuser.dataValues.student_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.name;
+      })
+      .catch(err => {
+        console.log(`error getting student basic details ${err}`);
+      });
+      
+    
+      // console.log(student, "-----------------------------------", bookId);
+    const result = await studentjobs.create({
+      job_id: req.params.id,
+      jobJobId: req.params.id,
+      student_basic_detail_id: student.student_basic_detail_id,
+      resume:req.file?req.file.originalname:''
+    });
+    if (result) {
+      res.status(201).send(result);
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(403).send(err.name);
+  }
+});
+
 
 module.exports = route;

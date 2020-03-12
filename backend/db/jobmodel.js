@@ -70,7 +70,7 @@ const sequelizeconnection = new sequelize('handshake', 'admin', 'admin#123', {
           
         },
         resume:{
-          type:DT.BLOB
+          type:DT.STRING(200)
         }
 
     }

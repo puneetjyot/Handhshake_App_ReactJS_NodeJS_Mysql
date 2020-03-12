@@ -409,7 +409,9 @@ route.post('/', async(req,res)=>{
   }
 });
 
+// route.get('/event',async(req,res)=>{
 
+// })
 
 
 module.exports=route;

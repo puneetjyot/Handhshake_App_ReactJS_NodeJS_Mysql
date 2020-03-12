@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import api_route from "../../app-config";
 import axios from "axios";
-import "../../styles/profilepic.css";
+import "../../styles/companyprofilepic.css";
 import "../../styles/company.css";
 import { Redirect } from "react-router-dom";
 

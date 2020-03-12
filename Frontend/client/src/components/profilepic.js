@@ -96,7 +96,8 @@ class ProfilePic extends Component {
             .post(`${api_route.host}/student/picture`,picdata, config)
             .then(res => {
               console.log(res.data);
-             this.setState({ propicture: res.data.name });
+              var src=`${api_route.host}//${res.data.name}`
+             this.setState({ propicture: src });
             })
             .catch(err => {
               console.log(err);

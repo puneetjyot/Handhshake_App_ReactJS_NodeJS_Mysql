@@ -9,16 +9,20 @@ class JobDescription extends Component {
         modalShow:"none",
         selectedFile: null,
         jobId:'',
-        applyerror:''
+        applyerror:'',
+        selectedjobId:'',
+        resumeShow:''
     }
 
-    onResumeSubmit= (jobId)=>
+    onResumeSubmit= (e)=>
     {
-        console.log(jobId)
+      e.preventDefault();
+        console.log(this.state.selectedjobId);
+        
         const data = new FormData()
         console.log(this.state.selectedFile)
-     data.append('file', this.state.selectedFile)
-     data.append('id',jobId)
+     data.append('myimage', this.state.selectedFile)
+    
       let config = {
       
       headers: {
@@ -28,12 +32,12 @@ class JobDescription extends Component {
     
    console.log(data)
   
-    axios.post(`${api_route.host}/jobs/upload/${jobId}`,data,config,{
-
-    })
+    axios.post(`${api_route.host}/student/upload/${this.state.selectedjobId}`,data,config)
     .then((res)=>{
 
      console.log(res)
+     var path=`${api_route.host}//${res.data.resume}`
+     this.setState({resumeShow:path})
     })
     .catch((err)=>
     {
@@ -89,14 +93,19 @@ class JobDescription extends Component {
                 <div>
                 
                 <label style={{fontSize:'15px',fontWeight:'500'}} for="img">Your Resume:</label>
+                <form onSubmit={this.onResumeSubmit} enctype="multipart/form-data">
                 <input style={{fontSize:'13px'}}  type="file" name="file" id="file" onChange={event=>{
                   console.log(event.target.files[0])
                    this.setState({selectedFile: event.target.files[0]}) 
                  } }/>
+                 {this.state.resumeShow?<a href={this.state.resumeShow} download="Resume 1.0">Download</a>:''}
+
                 <div>
-                <button className='form-control mt-2 btn btn-outline-success' onClick={(e)=>this.onResumeSubmit(this.props.jobdata.job_id)} >Submit</button>
+                <button className='form-control mt-2 btn btn-outline-success' onClick={(e)=>{
+                     this.setState({selectedjobId:this.props.jobdata.job_id}) 
+                } } >Submit</button>
                 </div>
-               
+                </form>
                 </div>
                 </div>
 
