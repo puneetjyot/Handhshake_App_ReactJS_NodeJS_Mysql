@@ -267,6 +267,13 @@ class StudentList extends Component {
                                   this.setState({id:i.student_basic_detail_id})
                                   }}
                                 >
+                                <div  className='d-flex justify-content-between'>
+                                <div className='d-flex'>
+                                <div className="col-5">
+                                <img style={{ maxWidth: "100%",
+    maxHeight: "100%"}}src={`${api_route.host}//${i.profile_picture}`}></img>
+                                </div>
+                                <div>
                                   <h3
                                     className="ml-5"
                                     style={{
@@ -291,7 +298,10 @@ class StudentList extends Component {
                                   <div  className="ml-5">
                                       {i.skill_name?i.skill_name:''}
                                       </div>
-                                  <div className="d-flex justify-content-between">
+                                      </div>
+                                      </div>
+                                  {/* <div className="d-flex justify-content-between"> */}
+                                  <div>
                                     <h3
                                       className="ml-5"
                                       style={{
@@ -317,6 +327,7 @@ class StudentList extends Component {
                                       Graduate On {i.end_time ? i.end_time : ""}
                                     </h3>
                                   :''}
+                                  </div>
                                   </div>
                                 </div>
                               </div>

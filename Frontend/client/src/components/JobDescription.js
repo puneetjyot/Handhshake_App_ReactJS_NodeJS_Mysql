@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import '../styles/jobs.css';
 import api_route from "../app-config";
+import { Redirect } from "react-router-dom";
 
 import axios from "axios";
 class JobDescription extends Component {
@@ -45,14 +46,32 @@ class JobDescription extends Component {
       console.log(err)
     })
   }
+
+  setRedirect = () => {
+    this.setState({
+      redirect: true
+    });
+  };
+  renderRedirect = () => {
+      console.log("in redirecting")
+    if (this.state.redirect) {
+        localStorage.setItem('visitedcompany',this.state.id)
+      return <Redirect to={`/visitcompany/home/${localStorage.getItem('visitedcompany')}`} />;
+    }
+  };
     
     render() { 
         console.log(this.props.jobdata)
         return ( 
             <div>
+             {this.renderRedirect()}
             <div className='p-2 ml-3 b-1'> 
             <p style={{fontSize:'24px',fontWeight:'700' ,fontFamily: "Suisse Int",marginBottom: "5px"}}>{this.props.jobdata.job_category}</p>
+            <div style={{textDecoration:'underline',cursor:"pointer"}}  onClick={e=>{this.setRedirect(this.props.jobdata.company_basic_detail.company_basic_detail_id)
+                                  this.setState({id:this.props.jobdata.company_basic_detail.company_basic_detail_id})
+                                  }}>
              <p style={{fontSize:'18px',fontWeight:'500' ,fontFamily: "Suisse Int",color:'rgba(0,0,0,.56)'}}>{this.props.jobdata.company_basic_detail?this.props.jobdata.company_basic_detail.company_name:''}</p>
+             </div>
             </div>
             <div className='d-flex ml-3'>
             <div className='d-flex '>

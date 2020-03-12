@@ -59,11 +59,13 @@ route.get("/", async (req, res) => {
 
     connection.query(
       `SELECT 
-      student_basic_details.*,
+      student_basic_details.*,profile.profile_picture,
       student_educations.education_id,student_educations.education_level,student_educations.end_time,student_educations.major
       ,GROUP_CONCAT(skill.skill_NAME) AS skill_name
   FROM
       handshake.student_basic_details
+      inner join handshake.student_profiles profile
+      on student_basic_details.student_basic_detail_id=profile.student_basic_detail_id
           LEFT JOIN
       handshake.student_educations ON student_basic_details.student_basic_detail_id = student_educations.student_basic_detail_id
           AND student_basic_details.college = student_educations.school_name

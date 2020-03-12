@@ -34,89 +34,30 @@ class VisitedProfilePic extends Component {
         .then(res => {
           console.log(res.data);
           this.setState({ dataarr: res.data });
+          if(res.data.student.profile_picture){
+            var src=`${api_route.host}//${res.data.student.profile_picture}`
+            this.setState({propicture:src})
+          }
         })
         .catch(err => {
           console.log(err);
         });
+      
     } catch (err) {
       console.log(err);
     }
   }
-  // editAfterName=()=>
-  // {
-  //   console.log(this.state.newName)
-  //   let config = {
-  //     headers: {
-  //       Authorization: `${window.localStorage.getItem("student")}`
-  //     }
-  //   };
-  //   console.log("mounting in profile------------");
-  //   try {
-  //     console.log("In try bloc");
-  //     axios
-  //       .get(`${api_route.host}/student/`, config)
-  //       .then(res => {
-  //         console.log(res.data);
-  //         this.setState({ dataarr: res.data.student });
-  //       })
-  //       .catch(err => {
-  //         console.log(err);
-  //       });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
+  
 
   handleEdit = async () => {
     await this.props.updateName(this.state.temp);
     let tempobj=this.state.dataarr
     tempobj.student.name=this.state.temp
     this.setState({dataarr:tempobj})
-   // this.setState({ newName: this.state.temp });
-    //this.editAfterName();
+  
   };
 
-  updatePic=(e)=>{
-    e.preventDefault();
-    //alert("pro pic change");
-    console.log("pro pic change")
-    // var nameofpic=this.state.picture;
-    // nameofpic.append('myimage',nameofpic);
-    // this.setState({picture:nameofpic})
-   // this.setState({picture:this.state.picture.append('myimage',this.state.picture)})
-    console.log(this.state.picture)
-    let picdata=new FormData();
-    picdata.append('myimage',this.state.picture)
-    let config = {
-          headers: {
-            Authorization: `${window.localStorage.getItem("student")}`,
-              'content-type': 'multipart/form-data'
-          }
-        };
-        let data= {
-          student:{
-            profile_picture: picdata,
-           
-          }
-        }
-        console.log("mounting in picture------------");
-        try {
-          console.log("In try block");
-          axios
-            .post(`${api_route.host}/student/picture`,picdata, config)
-            .then(res => {
-              console.log(res.data);
-             this.setState({ picture: res.data.picture });
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        } catch (err) {
-          console.log(err);
-        }
-     
-  }
-
+  
 
   render() {
     const show = this.state.saveflag ? "show" : "";

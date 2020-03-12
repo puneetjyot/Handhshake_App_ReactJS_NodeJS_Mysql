@@ -268,6 +268,79 @@ catch(err)
 }
 })
 
+
+route.get('/:id', async(req,res)=>{
+  console.log("----------getting company details")
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await company_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.company_basic_detail_id + "in details ------------------------"
+        );
+ 
+        company=tokenuser.dataValues
+        companyId = tokenuser.dataValues.company_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name= tokenuser.dataValues.company_name;
+ 
+      })
+      .catch(err =>{
+        console.log(`error getting company details ${err}`)
+      });
+   console.log(companyId)
+   const companybasic= await company_basic_details.findOne({where:{company_basic_detail_id:req.params.id}})
+      const result=await company_profile.findOne({
+      
+      where:{
+        company_basic_detail_id:req.params.id
+      }
+ 
+      })
+ 
+      if(result)
+      {
+        console.log(result.dataValues)
+        res.status(201).send({
+         company:{
+             company_profile:result.dataValues,
+             company_basic_details:companybasic.dataValues
+         }
+       })
+      }
+      else{
+        res.status(403).send(
+          {
+            errors:{
+              err:"Unable to add school"
+        }
+      }
+      )
+      }
+ 
+   
+   
+   
+    }
+ catch(err)
+ {
+  console.log(err);
+  res.status(403).send(
+    {
+    
+      errors:{
+        err:err
+  }
+ }
+ )
+ }
+ })
+
 route.put("/", async (req, res) => {
   console.log(req.body);
   console.log("In updating company");

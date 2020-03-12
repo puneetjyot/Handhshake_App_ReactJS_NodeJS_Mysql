@@ -155,7 +155,9 @@ filterByLocation=(value)=>{
                 <h3 className='ml-2' style={{fontSize:'16px',fontWeight:'700'}}>{i.job_title}</h3>
 
                 </div>
-                <h3 style={{fontSize:'16px',fontWeight:'400'}}>{i.company_basic_detail.company_name}</h3>
+               
+                <h3 style={{fontSize:'16px',fontWeight:'400'}} >{i.company_basic_detail.company_name}</h3>
+                                  
                 <h3 style={{color:"rgba(0,0,0,.56)",fontWeight:"200px",fontSize:'14px'}}>{i.job_category} Job</h3>
                 </div>
                 </div>
