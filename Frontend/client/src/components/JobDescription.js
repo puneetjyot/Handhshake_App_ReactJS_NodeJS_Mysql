@@ -98,7 +98,7 @@ class JobDescription extends Component {
                   console.log(event.target.files[0])
                    this.setState({selectedFile: event.target.files[0]}) 
                  } }/>
-                 {this.state.resumeShow?<a href={this.state.resumeShow} download="Resume 1.0">Download</a>:''}
+                 {this.state.resumeShow?<a href={this.state.resumeShow} download="Resume">Download</a>:''}
 
                 <div>
                 <button className='form-control mt-2 btn btn-outline-success' onClick={(e)=>{

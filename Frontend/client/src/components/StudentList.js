@@ -83,6 +83,27 @@ class StudentList extends Component {
     });
     this.setState({ studentarr: result });
   };
+
+  
+
+  filterSkill = value => {
+    let result = [];
+    console.log(value);
+    this.state.perStudentArr.map(i => {
+      if(null!=i.skill_name){
+        
+      
+      //console.log( i.company_basic_detail.company_name.indexOf(value))
+      if (
+        i.skill_name.toLowerCase().indexOf(value) >= 0 ||
+        i.skill_name.indexOf(value) >= 0
+      ) {
+        result.push(i);
+      }
+    }
+    });
+    this.setState({ studentarr: result });
+  };
   
   setRedirect = () => {
     this.setState({
@@ -196,6 +217,34 @@ class StudentList extends Component {
                     }}
                   ></input>
                 </div>
+
+
+                <div className="style__divider___1j_Fp"></div>
+                <div
+                  className="style__card-item___B1f7m:first-child"
+                  style={{ padding: "16px" }}
+                >
+                  <h3 style={{ fontSize: "16px", fontWeight: "500" }}>
+                    {" "}
+                    Skills{" "}
+                  </h3>
+                </div>
+                <div
+                  style={{
+                    paddingBottom: "16px",
+                    paddingLeft: "16px",
+                    paddingRight: "16px"
+                  }}
+                >
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="enter a skill..."
+                    onChange={e => {
+                      this.filterSkill(e.target.value);
+                    }}
+                  ></input>
+                </div>
               </div>
             </div>
             <div className="col-9">
@@ -228,6 +277,7 @@ class StudentList extends Component {
                                     {" "}
                                     {i ? i.name : ""}
                                   </h3>
+                                 
                                   <h3
                                     className="ml-5"
                                     style={{
@@ -238,6 +288,9 @@ class StudentList extends Component {
                                     {" "}
                                     {i ? i.college : ""}
                                   </h3>
+                                  <div  className="ml-5">
+                                      {i.skill_name?i.skill_name:''}
+                                      </div>
                                   <div className="d-flex justify-content-between">
                                     <h3
                                       className="ml-5"
@@ -248,10 +301,12 @@ class StudentList extends Component {
                                       }}
                                     >
                                       {" "}
-                                      {i ? i.education_level + "," : ""}
-                                      {i ? i.major : ""}
+                                      {i.education_level ? i.education_level + "," : ""}
+                                      {i.major ? i.major : ""}
+                                      
                                     </h3>
-                                    <h3
+                                   
+                                   {i.end_time? <h3
                                       className="mr-5"
                                       style={{
                                         fontSize: "16px",
@@ -259,8 +314,9 @@ class StudentList extends Component {
                                         color: "rgba(0,0,0,.8)"
                                       }}
                                     >
-                                      Graduate On {i ? i.end_time : ""}
+                                      Graduate On {i.end_time ? i.end_time : ""}
                                     </h3>
+                                  :''}
                                   </div>
                                 </div>
                               </div>

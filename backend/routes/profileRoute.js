@@ -1,14 +1,18 @@
-var express = require('express');
+var express = require("express");
 var route = express.Router();
-const {generateToken,decryptToken}=require('../service/tokenservice');
-const {generateUUID}=require('../service/uuidservice');
-const passport = require('../authenticate/passport_init')
-const key=require('../service/key');
-const {validateUsername,validatePassword,validateEmail} =require('../companymiddleware');
-const { company_basic_details }  = require('../db/index');
-const jwt = require('jsonwebtoken');
-var connection = require('../db_connection');
-const bcrypt = require('bcrypt');
+const { generateToken, decryptToken } = require("../service/tokenservice");
+const { generateUUID } = require("../service/uuidservice");
+const passport = require("../authenticate/passport_init");
+const key = require("../service/key");
+const {
+  validateUsername,
+  validatePassword,
+  validateEmail
+} = require("../companymiddleware");
+const { company_basic_details } = require("../db/index");
+const jwt = require("jsonwebtoken");
+var connection = require("../db_connection");
+const bcrypt = require("bcrypt");
 var multer = require("multer");
 const {
   student_basic_details
@@ -23,9 +27,8 @@ const {
   student_experience
 } = require("../db/studentmodel");
 
-
-route.get('/',async(req,res)=>{
-     console.log("----------getting all profiles")
+route.get("/", async (req, res) => {
+  console.log("----------getting all profiles");
   Decryptedtoken = decryptToken(req.headers.authorization);
   try {
     await student_basic_details
@@ -36,17 +39,17 @@ route.get('/',async(req,res)=>{
       })
       .then(tokenuser => {
         console.log(
-          tokenuser.dataValues.student_basic_detail_id + "in details ------------------------"
+          tokenuser.dataValues.student_basic_detail_id +
+            "in details ------------------------"
         );
         studentId = tokenuser.dataValues.student_basic_detail_id;
         email = tokenuser.dataValues.emailId;
-        name= tokenuser.dataValues.name;
-
+        name = tokenuser.dataValues.name;
       })
-      .catch(err =>{
-        console.log(`error posting student journey ${err}`)
+      .catch(err => {
+        console.log(`error posting student journey ${err}`);
       });
-    
+
     //   const result = await student_education.findAll({
     //       include:[{
     //             model:student_basic_details,
@@ -54,51 +57,56 @@ route.get('/',async(req,res)=>{
     //       }]
     //   });
 
-        connection.query(
-            `SELECT * FROM handshake.student_basic_details
-                inner join handshake.student_educations
-                where student_basic_details.college=student_educations.school_name and student_basic_details.student_basic_detail_id=student_educations.student_basic_detail_id`,
-     (err, results, fields) => {
-      if(err) {
-        res.send({
+    connection.query(
+      `SELECT 
+      student_basic_details.*,
+      student_educations.education_id,student_educations.education_level,student_educations.end_time,student_educations.major
+      ,GROUP_CONCAT(skill.skill_NAME) AS skill_name
+  FROM
+      handshake.student_basic_details
+          LEFT JOIN
+      handshake.student_educations ON student_basic_details.student_basic_detail_id = student_educations.student_basic_detail_id
+          AND student_basic_details.college = student_educations.school_name
+          LEFT JOIN
+      handshake.student_skills skill ON student_basic_details.student_basic_detail_id = skill.student_basic_detail_id
+  GROUP BY skill.student_basic_detail_id`,
+      (err, results, fields) => {
+        if (err) {
+          res.send({
             success: false,
             msg: "Something went wrong",
             msgDesc: err
-        })
-      } else {
-
-            res.send({
-              success: true,
-              msg: "Successfully fetched student profile" ,
-              msgDesc: results
-          }) 
-      } 
-    })
+          });
+        } else {
+          res.send({
+            success: true,
+            msg: "Successfully fetched student profile",
+            msgDesc: results
+          });
+        }
+      }
+    );
 
     //   console.log("sending jobs-----------------"+result)
     //   res.status(201).send(
     //     {
-    //       result:result 
+    //       result:result
     //     }
     //   )
-}
-catch(err)
-{
-  console.log(`error getting jobs ${err}`)
-  res.status(500).send({
-    errors: {
-      body: err
-    }
-
-})
-}
-})
+  } catch (err) {
+    console.log(`error getting jobs ${err}`);
+    res.status(500).send({
+      errors: {
+        body: err
+      }
+    });
+  }
+});
 
 route.get("/:id", async (req, res) => {
-  
-  console.log("In student route"+req.params.id);
+  console.log("In student route" + req.params.id);
   Decryptedtoken = decryptToken(req.headers.authorization);
-  let studentId, email, name,student;
+  let studentId, email, name, student;
 
   console.log(Decryptedtoken.email);
   // if (Decryptedtoken.email !== null) {
@@ -112,7 +120,7 @@ route.get("/:id", async (req, res) => {
   //       console.log(
   //         tokenuser.dataValues.student_basic_detail_id + "in details"
   //       );
-       
+
   //       studentId = tokenuser.dataValues.student_basic_detail_id;
   //       email = tokenuser.dataValues.emailId;
   //       name= tokenuser.dataValues.name;
@@ -129,14 +137,16 @@ route.get("/:id", async (req, res) => {
   //   });
   // }
 
-    student=student_basic_details.findOne({
-    where:{
-      student_basic_detail_id:req.params.id
-    }
-  }).then(students=>{
-    console.log(students.dataValues)
-    student=students.dataValues
-  })
+  student = student_basic_details
+    .findOne({
+      where: {
+        student_basic_detail_id: req.params.id
+      }
+    })
+    .then(students => {
+      console.log(students.dataValues);
+      student = students.dataValues;
+    });
   let studentEducations = [];
   let allEducation = student_education
     .findAll({
@@ -146,87 +156,92 @@ route.get("/:id", async (req, res) => {
     })
     .then(student_educations => {
       // studentEducation=;
-      
+
       for (var i = 0; i < student_educations.length; i++) {
         studentEducations[i] = student_educations[i].dataValues;
       }
-     // console.log(studentEducations);
-    }).catch(err =>{
-      console.log(`error getting student education ${err}`)
-    });;
-var studentexperiencesarr=[];
-student_experience.findAll({
-where: {
-      student_basic_detail_id: req.params.id
-    }
-  })
-.then(studentexperiences =>{
-  //console.log("gettong experience"+JSON.stringify(studentexperiences))
-
-  for (var i = 0; i < studentexperiences.length; i++) {
-    studentexperiencesarr[i] = studentexperiences[i];
-  }
- // console.log(studentexperiences)
-  //studentexperiences=studentexperience.dataValues;
-}).catch(err =>{
-  console.log(`error getting student experience ${err}`)
-});
-// try{
-//   student_skills_list=  await student_basic_details.hasSkill()
-//   console.log(student_skills_list)
-// }
-// catch(e){
-//   console.log(e)
-// }
-
-student_profile
-  .findOne({
-    where: {
-      student_basic_detail_id: req.params.id
-    }
-  })
-  .then(studentprofile => {
-    console.log(studentprofile)
-    const studenttoken = generateToken(student.email);
-    if(studentprofile)
-    {
-    studentprofile = studentprofile.dataValues;
-    }
-    console.log(student.email);
-    res.status(201).json({
-      student: {
-        email: student.emailId,
-        name:student.name,
-        career_objective:studentprofile? studentprofile.career_objective:'',
-        profile_picture: studentprofile? studentprofile.profile_picture:'',
-        token: studenttoken,
-        education:studentEducations?studentEducations:'',
-        profile:studentprofile?studentprofile:'',
-        experience:studentexperiencesarr?studentexperiencesarr:'',
-        student_basic_details: student
-        // education:
-        // {
-        //   schoolname:studentEducation.school_name,
-        //   educationlevel:studentEducation.education_level,
-        //   starttime:studentEducation.start_time,
-        //   endtime:studentEducation.end_time,
-        //   major:studentEducation.major,
-        //   minor:studentEducation.minor,
-        //   gpa:studentEducation.GPA,
-        //   gpaBoolean:studentEducation.GPAboolean,
-
-        // }
-      }
+      // console.log(studentEducations);
+    })
+    .catch(err => {
+      console.log(`error getting student education ${err}`);
     });
-  }).catch(err =>{
-    console.log(`error getting student profile ${err}`)
-  });;
-})
+  var studentexperiencesarr = [];
+  student_experience
+    .findAll({
+      where: {
+        student_basic_detail_id: req.params.id
+      }
+    })
+    .then(studentexperiences => {
+      //console.log("gettong experience"+JSON.stringify(studentexperiences))
+
+      for (var i = 0; i < studentexperiences.length; i++) {
+        studentexperiencesarr[i] = studentexperiences[i];
+      }
+      // console.log(studentexperiences)
+      //studentexperiences=studentexperience.dataValues;
+    })
+    .catch(err => {
+      console.log(`error getting student experience ${err}`);
+    });
+  // try{
+  //   student_skills_list=  await student_basic_details.hasSkill()
+  //   console.log(student_skills_list)
+  // }
+  // catch(e){
+  //   console.log(e)
+  // }
+
+  student_profile
+    .findOne({
+      where: {
+        student_basic_detail_id: req.params.id
+      }
+    })
+    .then(studentprofile => {
+      console.log(studentprofile);
+      const studenttoken = generateToken(student.email);
+      if (studentprofile) {
+        studentprofile = studentprofile.dataValues;
+      }
+      console.log(student.email);
+      res.status(201).json({
+        student: {
+          email: student.emailId,
+          name: student.name,
+          career_objective: studentprofile
+            ? studentprofile.career_objective
+            : "",
+          profile_picture: studentprofile ? studentprofile.profile_picture : "",
+          token: studenttoken,
+          education: studentEducations ? studentEducations : "",
+          profile: studentprofile ? studentprofile : "",
+          experience: studentexperiencesarr ? studentexperiencesarr : "",
+          student_basic_details: student
+          // education:
+          // {
+          //   schoolname:studentEducation.school_name,
+          //   educationlevel:studentEducation.education_level,
+          //   starttime:studentEducation.start_time,
+          //   endtime:studentEducation.end_time,
+          //   major:studentEducation.major,
+          //   minor:studentEducation.minor,
+          //   gpa:studentEducation.GPA,
+          //   gpaBoolean:studentEducation.GPAboolean,
+
+          // }
+        }
+      });
+    })
+    .catch(err => {
+      console.log(`error getting student profile ${err}`);
+    });
+});
 
 route.get("/education/:id", async (req, res) => {
   console.log(req.body);
   console.log("In get education");
-  var studentId,student;
+  var studentId, student;
   Decryptedtoken = decryptToken(req.headers.authorization);
   try {
     await student_basic_details
@@ -247,7 +262,6 @@ route.get("/education/:id", async (req, res) => {
         console.log(`error getting student basic details ${err}`);
       });
 
-     
     const preeducation = await student_education.findAll({
       where: {
         student_basic_detail_id: req.params.id
@@ -363,7 +377,6 @@ route.get("/journey/:id", async (req, res) => {
 });
 
 route.get("/experience/:id", async (req, res) => {
-  
   try {
     const experiencearr = await student_experience.findAll({
       where: {
@@ -385,4 +398,4 @@ route.get("/experience/:id", async (req, res) => {
   }
 });
 
-module.exports=route;
+module.exports = route;

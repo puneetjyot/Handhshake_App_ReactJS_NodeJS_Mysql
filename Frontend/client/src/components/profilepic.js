@@ -23,18 +23,18 @@ class ProfilePic extends Component {
  async componentDidMount() {
 
 
-     axios.get(`${api_route.host}/student/picture`) .then(res=> 
-      {
-        console.log('getting picture data from backend',res.data.data.profile_picture);
+    //  axios.get(`${api_route.host}/student/picture`) .then(res=> 
+    //   {
+    //     console.log('getting picture data from backend',res.data.data.profile_picture);
         
-      //  var imageURL = 'data:image/png;base64,' + new Buffer(res.data.data.profile_picture, 'binary').toString('base64')
-        var src=`${api_route.host}//res.data.data.profile_picture`
-        console.log(src)
-        this.setState({propicture:src})
+    
+    //     var src=`${api_route.host}//res.data.data.profile_picture`
+    //     console.log(src)
+    //     this.setState({propicture:src})
         
-      }).catch(err=>{
-        console.log(err)
-      })
+    //   }).catch(err=>{
+    //     console.log(err)
+    //   })
     
    
 

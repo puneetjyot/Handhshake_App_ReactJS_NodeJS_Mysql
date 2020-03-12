@@ -12,7 +12,8 @@ class StudentJobList extends Component {
     perStudentArr: [],
     redirect: false,
     id: "",
-    value: "Pending"
+    value: "Pending",
+    path:''
   };
 
   componentDidMount() {
@@ -232,8 +233,9 @@ class StudentJobList extends Component {
                 <div className="style__jobs___3seWY">
                   <div className="style__card-item___B1f7m:last-child"></div>
                   <div className="style__media-body___1_M6P">
-                    {this.state.perStudentArr
-                      ? this.state.studentarr.map(i => (
+                    {this.state.perStudentArr.length > 0 ? (
+                      this.state.perStudentArr ? (
+                        this.state.studentarr.map(i => (
                           <div>
                             <div className="p-2">
                               <div class="card mt-4">
@@ -265,6 +267,19 @@ class StudentJobList extends Component {
                                         {" "}
                                         {i ? i.name : ""}
                                       </h3>
+                                    </div>
+                                    <div>
+                                      <div>
+                                
+                                       {
+                                          <a
+                                            href={`${api_route.host}//${i.resume}`}
+                                            download="Resume 1.0"
+                                          >
+                                           Resume Download
+                                          </a>
+                                        }
+                                      </div>
                                     </div>
                                     <div className="ml-5 col-3">
                                       <select
@@ -356,7 +371,16 @@ class StudentJobList extends Component {
                             </div>
                           </div>
                         ))
-                      : ""}
+                      ) : (
+                        ""
+                      )
+                    ) : (
+                      <div align="center">
+                        <h3 style={{ color: "rgba(0,0,0,0.58" }}>
+                          No one applied yet!
+                        </h3>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

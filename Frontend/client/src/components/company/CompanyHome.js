@@ -18,14 +18,15 @@ class CompanyHome extends Component {
     perjobarr: [],
     modalShow: "none",
     jobtitle: "",
-    value: 'Full-Time',
-    job_category:'Full-Time',
-    joblocation:'',
-    salary:'',
-    deadline:'',
-    jobdescription:'',
-    addSuccessMsg:'',
-    id:''
+    value: "Full-Time",
+    job_category: "Full-Time",
+    joblocation: "",
+    salary: "",
+    deadline: "",
+    jobdescription: "",
+    addSuccessMsg: "",
+    id: "",
+    propicture:''
   };
   componentDidMount() {
     let config = {
@@ -41,7 +42,11 @@ class CompanyHome extends Component {
         .get(`${api_route.host}/company/`, config)
         .then(res => {
           this.setState({ companyobj: res.data.company });
-          console.log(res.data);
+          console.log(res.data.company);
+          if(res.data.company.company_profile.profilepicaddress){
+            var src=`${api_route.host}//${res.data.company.company_profile.profilepicaddress}`
+            this.setState({propicture:src})
+            }
           try {
             console.log("In try bloc");
             axios
@@ -50,7 +55,7 @@ class CompanyHome extends Component {
                 this.setState({ jobarr: res.data.result });
                 this.setState({ perjobarr: res.data.result });
                 this.setState({ jobobj: res.data.result[0] });
-                 console.log(this.state.companyobj)
+                console.log(this.state.companyobj);
                 const result = this.state.perjobarr.filter(
                   i =>
                     i.company_basic_detail.company_basic_detail_id ==
@@ -66,8 +71,6 @@ class CompanyHome extends Component {
           } catch (err) {
             console.log(err);
           }
-       
-       
         })
         .catch(err => {
           console.log(err);
@@ -75,7 +78,9 @@ class CompanyHome extends Component {
     } catch (err) {
       console.log(err);
     }
-
+    console.log("getting education in mount");
+  //  this.props.getEducation();
+   
     
   }
   filterByTitleOrCompany = value => {
@@ -101,40 +106,12 @@ class CompanyHome extends Component {
     });
   };
   renderRedirect = () => {
-      console.log("in redirecting")
+    console.log("in redirecting");
     if (this.state.redirect) {
-        localStorage.setItem('jobid',this.state.id)
+      localStorage.setItem("jobid", this.state.id);
       return <Redirect to={`/job/student/${this.state.id}`} />;
     }
   };
-
-  getStudents= (jobId) =>{
-    // let config = {
-    //   headers: {
-    //     Authorization: `${window.localStorage.getItem("company")}`
-    //   }
-    // };
-    // console.log("mounting in education------------");
-    // //this.setState({educationarr:this.props.educationData})
-    // try {
-    //   console.log("In try bloc");
-    //   axios
-    //     .get(`${api_route.host}/jobs/${jobId}/students`, config)
-    //     .then(res => {
-    //       this.setState({ companyobj: res.data.company });
-    //       console.log(res.data);
-         
-       
-       
-    //     })
-    //     .catch(err => {
-    //       console.log(err);
-    //     });
-    // } catch (err) {
-    //   console.log(err);
-    // }
-
-  }
 
   filterByLocation = value => {
     let result = [];
@@ -151,39 +128,38 @@ class CompanyHome extends Component {
     this.setState({ jobarr: result });
   };
 
-  handleSubmit= e =>{
-      e.preventDefault();
+  handleSubmit = e => {
+    e.preventDefault();
     let config = {
-        headers: {
-          Authorization: `${window.localStorage.getItem("company")}`
-        }
-      };
-      let data = {
-        job: {
-          job_title: this.state.jobtitle,
-          deadline: this.state.deadline,
-          location: this.state.joblocation,
-          salary: this.state.salary,
-          job_description: this.state.jobdescription,
-          job_category: this.state.job_category,
-         
-        }
-      };
-      axios
-        .post(`${api_route.host}/jobs/`, data, config)
-        .then(res => {
-            this.setState({addSuccessMsg:'Job added Successfully'})
-          let newarr = this.state.perjobarr;
-          newarr.push(res.data);
-          console.log(newarr);
-          
-          this.setState({ jobarr: newarr });
-          this.setState({ perjobarr: newarr });
-        })
-        .catch(err => {
-          console.log(err);
-        });
-  }
+      headers: {
+        Authorization: `${window.localStorage.getItem("company")}`
+      }
+    };
+    let data = {
+      job: {
+        job_title: this.state.jobtitle,
+        deadline: this.state.deadline,
+        location: this.state.joblocation,
+        salary: this.state.salary,
+        job_description: this.state.jobdescription,
+        job_category: this.state.job_category
+      }
+    };
+    axios
+      .post(`${api_route.host}/jobs/`, data, config)
+      .then(res => {
+        this.setState({ addSuccessMsg: "Job added Successfully" });
+        let newarr = this.state.perjobarr;
+        newarr.push(res.data);
+        console.log(newarr);
+
+        this.setState({ jobarr: newarr });
+        this.setState({ perjobarr: newarr });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
   editCompanyInfo = e => {
     //console.log(this.state.schoolname+" "+editid)
@@ -214,6 +190,37 @@ class CompanyHome extends Component {
       });
   };
 
+  updatePic=(e)=>{
+    e.preventDefault();
+    console.log("pro pic change")
+    console.log(this.state.picture)
+    let picdata=new FormData();
+    picdata.append('myimage',this.state.picture)
+    let config = {
+          headers: {
+            Authorization: `${window.localStorage.getItem("company")}`
+          }
+        };
+       
+        console.log("mounting in picture------------");
+        try {
+          console.log("In try block");
+          axios
+            .post(`${api_route.host}/company/picture`,picdata, config)
+            .then(res => {
+              console.log(res.data);
+              var src=`${api_route.host}//${res.data.name}`
+             this.setState({ propicture: src });
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        } catch (err) {
+          console.log(err);
+        }
+     
+  }
+
   render() {
     return (
       <div>
@@ -223,14 +230,47 @@ class CompanyHome extends Component {
             <div className="card mt-3">
               <div className="card-title p-2" align="center">
                 <div>
-                  <div className="style__edit-photo___B-_os">
-                    <div>
-                      <ion-icon
-                        size="large"
-                        name="camera"
-                        style={{ color: "#1569e0" }}
-                      ></ion-icon>
-                    </div>
+                  <div align="center" className="mt-2">
+                    {console.log(api_route.host / this.state.propicture)}
+                    {this.state.propicture ? (
+                      <div className="style__edit-photo___B-_os">
+                        <img src={this.state.propicture} />
+                      </div>
+                    ) : (
+                      <form onSubmit={this.updatePic}>
+                        <div>
+                          <button className="style__edit-photo___B-_os">
+                            <div>
+                              <ion-icon
+                                size="large"
+                                name="camera"
+                                style={{ color: "#1569e0" }}
+                              ></ion-icon>
+                            </div>
+
+                            <div>
+                              {" "}
+                              <input
+                                style={{ color: "#1569e0", fontSize: "13px" }}
+                                type="file"
+                                name="file"
+                                onChange={e => {
+                                  console.log(e.target.files[0]);
+                                  this.setState({ picture: e.target.files[0] });
+                                }}
+                              ></input>
+                            </div>
+                          </button>
+                        </div>
+
+                        <input
+                          style={{ fontSize: "10px" }}
+                          type="submit"
+                          className="btn btn-primary mt-3"
+                          value="Edit Pic"
+                        ></input>
+                      </form>
+                    )}
                   </div>
                 </div>
                 <div className="mt-3">
@@ -497,7 +537,6 @@ class CompanyHome extends Component {
                     className="modal-content col-5"
                     style={{ fontFamily: "Suisse" }}
                   >
-
                     <div className="container">
                       <span
                         class="close"
@@ -507,9 +546,17 @@ class CompanyHome extends Component {
                       >
                         &times;
                       </span>
-                      {this.state.addSuccessMsg?<p style={{color:'green'}}>{this.state.addSuccessMsg}</p>:''}
-                      <div align='center'>
-                        <h3 style={{ fontWeight: "bold", marginBottom: "5px" }}>New Job</h3>
+                      {this.state.addSuccessMsg ? (
+                        <p style={{ color: "green" }}>
+                          {this.state.addSuccessMsg}
+                        </p>
+                      ) : (
+                        ""
+                      )}
+                      <div align="center">
+                        <h3 style={{ fontWeight: "bold", marginBottom: "5px" }}>
+                          New Job
+                        </h3>
                       </div>
                       <form onSubmit={this.handleSubmit}>
                         <div className="form-group col-md-11">
@@ -539,24 +586,27 @@ class CompanyHome extends Component {
                           <select
                             value={this.state.job_category}
                             id="category"
-                            className='form-control'
+                            className="form-control"
                             onChange={e => {
                               this.setState({ job_category: e.target.value });
                             }}
                             required
                           >
-                              <option value='Full-Time'>Full Time</option>
-                              <option value='Part-Time'>Part Time</option>
-                              <option value='On-Campus'>On Campus</option>
-                              <option value='Internship'>Internship</option>
+                            <option value="Full-Time">Full Time</option>
+                            <option value="Part-Time">Part Time</option>
+                            <option value="On-Campus">On Campus</option>
+                            <option value="Internship">Internship</option>
                           </select>
                         </div>
                         <div className="form-group col-md-11">
                           <div>
                             <label
-                              style={{ fontWeight: "bold", marginBottom: "5px" }}
+                              style={{
+                                fontWeight: "bold",
+                                marginBottom: "5px"
+                              }}
                             >
-                             Location
+                              Location
                             </label>
                           </div>
 
@@ -584,7 +634,10 @@ class CompanyHome extends Component {
                         <div className="col-md-11 d-flex p-0">
                           <div className="form-group col-md-6 ">
                             <label
-                              style={{ fontWeight: "bold", marginBottom: "5px" }}
+                              style={{
+                                fontWeight: "bold",
+                                marginBottom: "5px"
+                              }}
                             >
                               Salary
                             </label>
@@ -602,7 +655,10 @@ class CompanyHome extends Component {
                           </div>
                           <div className="form-group col-md-6">
                             <label
-                              style={{ fontWeight: "bold", marginBottom: "5px" }}
+                              style={{
+                                fontWeight: "bold",
+                                marginBottom: "5px"
+                              }}
                             >
                               Deadline
                             </label>
@@ -628,7 +684,6 @@ class CompanyHome extends Component {
                             Description
                           </label>
                           <textarea
-                            
                             id="jobdescription"
                             name="jobdescription"
                             className="form-control"
@@ -656,8 +711,9 @@ class CompanyHome extends Component {
                       <div key={i.job_id}>
                         <div
                           className="style__selected___1DMZ3 p-2 mt-3 jobdiv m-1 card"
-                          onClick={e=>{this.setRedirect(i.job_id)
-                                  this.setState({id:i.job_id})
+                          onClick={e => {
+                            this.setRedirect(i.job_id);
+                            this.setState({ id: i.job_id });
                           }}
                         >
                           <div className="d-flex">
@@ -670,7 +726,9 @@ class CompanyHome extends Component {
                             </h3>
                           </div>
                           <h3 style={{ fontSize: "16px", fontWeight: "400" }}>
-                            {i.company_basic_detail?i.company_basic_detail.company_name:''}
+                            {i.company_basic_detail
+                              ? i.company_basic_detail.company_name
+                              : ""}
                           </h3>
                           <h3
                             style={{

@@ -38,6 +38,7 @@ class Main extends Component {
         <Route path="/student/jobs" component={StudentJobs} />
         <Route path="/student/application" component={StudentApplication} />
         <Route path="/student/list" component={StudentList} />
+        <Route path="/company/list" component={StudentList} />
         <Route path="/student/profile/:id" component={MainVisitedProfile} />
         <Route path="/job/student/:id" component={StudentJobList} />
         <Route path="/event/student/:id" component={StudentEventList} />

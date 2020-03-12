@@ -50,6 +50,7 @@ route.get('/',async(req,res)=>{
       });
     
       const result = await event.findAll({
+     order :[['date','asc']],
         include:[{
               model:company_basic_details
            

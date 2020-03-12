@@ -9,6 +9,18 @@ const { company_basic_details }  = require('../db/index');
 const {company_profile} = require('../db/comapnymodel')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+var multer = require("multer");
+
+var storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, "public");
+  },
+  filename: function(req, file, cb) {
+    cb(null,  file.originalname);
+  }
+});
+
+var upload = multer({ storage: storage });
 
 
 route.post('/register', validateUsername,validatePassword,validateEmail,async (req, res) => {
@@ -374,6 +386,59 @@ route.put("/", async (req, res) => {
   
   
    
+  } catch (err) {
+    console.log(err);
+    res.status(403).send({
+      errors: {
+        err: err
+      }
+    });
+  }
+});
+
+
+route.post("/picture",upload.single('myimage'), async (req, res) => {
+  console.log(JSON.stringify(req.file)+" file post");
+ 
+ 
+  var companyId;
+  Decryptedtoken = decryptToken(req.headers.authorization);
+  try {
+    await company_basic_details
+      .findOne({
+        where: {
+          emailId: Decryptedtoken.email
+        }
+      })
+      .then(tokenuser => {
+        console.log(
+          tokenuser.dataValues.company_basic_detail_id + "in details"
+        );
+        companyId = tokenuser.dataValues.company_basic_detail_id;
+        email = tokenuser.dataValues.emailId;
+        name = tokenuser.dataValues.name;
+      })
+      .catch(err => {
+        console.log(`error getting company basic details ${err}`);
+      });
+
+    //  var imageData = fs.readFileSync(req.file.path);
+     // console.log(imageData)
+    const result = await company_profile.update(
+      { profilepicaddress: req.file.originalname },
+      { where: { company_basic_detail_id: companyId } }
+    );
+
+    if (result) {
+      console.log(result)
+        res.status(201).send({name:req.file.originalname});
+    } else {
+      res.status(403).send({
+        errors: {
+          err: "Unable to add school"
+        }
+      });
+    }
   } catch (err) {
     console.log(err);
     res.status(403).send({
