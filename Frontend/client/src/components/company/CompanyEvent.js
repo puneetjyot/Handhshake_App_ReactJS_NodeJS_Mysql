@@ -58,6 +58,7 @@ class CompanyHome extends Component {
                       .company_basic_detail_id
                 );
                 console.log(result);
+                this.setState({ perjobarr: result });
                 this.setState({ jobarr: result });
               })
               .catch(err => {
@@ -288,6 +289,7 @@ class CompanyHome extends Component {
                               <option value='All'>All</option>
                               <option value='CSE'>Computer Science</option>
                               <option value='Se'>Software Engineer</option>
+                              <option value='EE'>Electrical Engineer</option>
                               <option value='EM'>Engineering Management</option>
                               <option value='IE'>Industrial Engineering</option>
                           </select>

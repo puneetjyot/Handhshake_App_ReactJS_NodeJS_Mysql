@@ -158,7 +158,7 @@ class ProfilePic extends Component {
               </div>
 
               <div className="card-body " align="center">
-                {true? (
+                {this.state.dataarr.student? (
                   
                   <div>
                
@@ -172,19 +172,19 @@ class ProfilePic extends Component {
                       className="card-title"
                       style={{ fontSize: "16px", fontWeight: "500" }}
                     >
-                      {this.state.dataarr.student
+                      {this.state.dataarr.student.education.length>0
                         ? this.state.dataarr.student.education[0].school_name
-                        : ""}
+                        : this.state.dataarr.student?this.state.dataarr.student.student_basic_details.college:''}
                     </h4>
                     <h4
                       className="card-title"
                       style={{ fontSize: "16px", fontWeight: "500" }}
                     >
-                      {this.state.dataarr.student
-                        ? this.state.dataarr.student.education[0].education_level
+                      {this.state.dataarr.student.education.length>0
+                        ? this.state.dataarr.student.education[0].education_level+","
                         : ""}
-                      ,
-                      {this.state.dataarr.student
+                      
+                      {this.state.dataarr.student.education.length>0
                         ? this.state.dataarr.student.education[0].major
                         : ""}
                     </h4>
@@ -196,11 +196,11 @@ class ProfilePic extends Component {
                         color: "rgba(0,0,0,.56)"
                       }}
                     >
-                      {this.state.dataarr.student
+                      {this.state.dataarr.student.education.length>0
                         ? this.state.dataarr.student.education[0].education_level
                         : ""}{" "}
                       • GPA:{" "}
-                      {this.state.dataarr.student
+                      {this.state.dataarr.student.education.length>0
                         ? this.state.dataarr.student.education[0].GPA
                         : ""}
                     </h4>

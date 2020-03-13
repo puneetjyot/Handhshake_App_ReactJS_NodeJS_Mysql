@@ -39,10 +39,11 @@ class JobDescription extends Component {
      console.log(res)
      var path=`${api_route.host}//${res.data.resume}`
      this.setState({resumeShow:path})
+     this.setState({applyerror:'Successfully Applied'})
     })
     .catch((err)=>
     {
-        this.setState({applyerror:'UniqueError'})
+        this.setState({applyerror:'Job Already Applied'})
       console.log(err)
     })
   }
@@ -100,7 +101,7 @@ class JobDescription extends Component {
  
             <div className= "modal-content col-5" style={{fontFamily: "Suisse"}}>
             <div className='container'>
-            {this.state.applyerror?<p style={{color:'red'}}>Job Already applied</p>:''}
+            {this.state.applyerror?<p style={{color:'red'}}>{this.state.applyerror}</p>:''}
                 <span class="close" onClick={e=>{
                     this.setState({modalShow:'none'})
                     this.setState({applyerror:''})
@@ -117,7 +118,7 @@ class JobDescription extends Component {
                   console.log(event.target.files[0])
                    this.setState({selectedFile: event.target.files[0]}) 
                  } }/>
-                 {this.state.resumeShow?<a href={this.state.resumeShow} download="Resume">Download</a>:''}
+                 {this.state.resumeShow?<a href={this.state.resumeShow} target="_blank" download="Resume">Download</a>:''}
 
                 <div>
                 <button className='form-control mt-2 btn btn-outline-success' onClick={(e)=>{

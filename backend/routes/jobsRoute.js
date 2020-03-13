@@ -309,7 +309,7 @@ route.get("/:id/students", async (req, res) => {
         
           INNER JOIN
          studentjobs b ON a.student_basic_detail_id = b.student_basic_detail_id
-             INNER JOIN
+             left JOIN
          handshake.student_educations e
      ON
          a.college = e.school_name

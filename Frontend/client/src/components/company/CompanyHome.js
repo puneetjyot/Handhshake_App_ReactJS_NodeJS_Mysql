@@ -63,6 +63,7 @@ class CompanyHome extends Component {
                       .company_basic_detail_id
                 );
                 console.log(result);
+                this.setState({ perjobarr: result });
                 this.setState({ jobarr: result });
               })
               .catch(err => {
@@ -155,6 +156,7 @@ class CompanyHome extends Component {
 
         this.setState({ jobarr: newarr });
         this.setState({ perjobarr: newarr });
+       
       })
       .catch(err => {
         console.log(err);
@@ -231,7 +233,7 @@ class CompanyHome extends Component {
               <div className="card-title p-2" align="center">
                 <div>
                   <div align="center" className="mt-2">
-                    {console.log(api_route.host / this.state.propicture)}
+                   
                     {this.state.propicture ? (
                       <div className="style__edit-photo___B-_os">
                         <img src={this.state.propicture} />

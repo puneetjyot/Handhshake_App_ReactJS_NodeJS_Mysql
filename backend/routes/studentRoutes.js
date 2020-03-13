@@ -128,7 +128,7 @@ route.get("/", async (req, res) => {
     .then(studentprofile => {
       console.log("profile");
       const studenttoken = generateToken(email);
-      studentprofile = studentprofile.dataValues;
+      studentprofile = studentprofile? studentprofile.dataValues:'';
       console.log(studentBasicDetail);
 
       res.status(201).json({
@@ -142,18 +142,8 @@ route.get("/", async (req, res) => {
           profile: studentprofile,
           experience: studentexperiencesarr,
           student_basic_details: studentBasicDetail
-          // education:
-          // {
-          //   schoolname:studentEducation.school_name,
-          //   educationlevel:studentEducation.education_level,
-          //   starttime:studentEducation.start_time,
-          //   endtime:studentEducation.end_time,
-          //   major:studentEducation.major,
-          //   minor:studentEducation.minor,
-          //   gpa:studentEducation.GPA,
-          //   gpaBoolean:studentEducation.GPAboolean,
-
-          // }
+          
+          
         }
       });
     })
@@ -225,9 +215,24 @@ route.post("/journey", async (req, res) => {
       { career_objective: req.body.student.career_objective },
       { where: { student_basic_detail_id: studentId } }
     );
+    console.log("result"+result)
+    if(result!=0){
     res.status(201).send({
       result: req.body.student.career_objective
     });
+  }
+  else{
+    const addresult = await student_profile.create(
+      { career_objective: req.body.student.career_objective,
+      student_basic_detail_id:studentId }
+    
+    );
+    console.log("add result"+addresult)
+    res.status(201).send({
+      result: req.body.student.career_objective
+    });
+  }
+  
   } catch (err) {
     console.log(`error posting student journey ${err}`);
     res.status(500).send({
